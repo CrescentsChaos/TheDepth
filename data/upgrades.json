@@ -1,0 +1,102 @@
+[
+  {
+    "id": "bite",
+    "name": "Razor Teeth",
+    "description": "+12% bite damage per level.",
+    "stat": "bite_damage",
+    "per_level": 0.12,
+    "max_level": 10,
+    "base_cost": 50,
+    "cost_growth": 1.45
+  },
+  {
+    "id": "speed",
+    "name": "Hydrodynamics",
+    "description": "+6% swim speed per level.",
+    "stat": "speed",
+    "per_level": 0.06,
+    "max_level": 8,
+    "base_cost": 60,
+    "cost_growth": 1.5
+  },
+  {
+    "id": "stamina",
+    "name": "Big Lungs",
+    "description": "+12% boost stamina per level.",
+    "stat": "stamina",
+    "per_level": 0.12,
+    "max_level": 8,
+    "base_cost": 40,
+    "cost_growth": 1.4
+  },
+  {
+    "id": "health",
+    "name": "Thick Hide",
+    "description": "+10% max health per level.",
+    "stat": "max_health",
+    "per_level": 0.1,
+    "max_level": 10,
+    "base_cost": 60,
+    "cost_growth": 1.45
+  },
+  {
+    "id": "belly",
+    "name": "Big Belly",
+    "description": "+12% hunger capacity per level.",
+    "stat": "max_hunger",
+    "per_level": 0.12,
+    "max_level": 8,
+    "base_cost": 40,
+    "cost_growth": 1.4
+  },
+  {
+    "id": "metabolism",
+    "name": "Slow Metabolism",
+    "description": "-8% hunger drain per level.",
+    "stat": "hunger_efficiency",
+    "per_level": 0.08,
+    "max_level": 6,
+    "base_cost": 80,
+    "cost_growth": 1.5
+  },
+  {
+    "id": "light",
+    "name": "Bioluminescence",
+    "description": "+15% light radius in dark waters per level.",
+    "stat": "light",
+    "per_level": 0.15,
+    "max_level": 6,
+    "base_cost": 70,
+    "cost_growth": 1.45
+  },
+  {
+    "id": "hull",
+    "name": "Deep Hull",
+    "description": "-20% pressure damage per level. Essential below 1500 m.",
+    "stat": "pressure_resist",
+    "per_level": 0.2,
+    "max_level": 5,
+    "base_cost": 150,
+    "cost_growth": 1.7
+  },
+  {
+    "id": "scavenger",
+    "name": "Scavenger",
+    "description": "+15% coins from prey per level.",
+    "stat": "coin_bonus",
+    "per_level": 0.15,
+    "max_level": 8,
+    "base_cost": 90,
+    "cost_growth": 1.5
+  },
+  {
+    "id": "scent",
+    "name": "Scent Magnet",
+    "description": "Small prey are drawn toward you (+90 px radius per level).",
+    "stat": "pull",
+    "per_level": 90,
+    "max_level": 5,
+    "base_cost": 120,
+    "cost_growth": 1.6
+  }
+]

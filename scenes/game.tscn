@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
+[ext_resource type="Script" path="res://scripts/game/world_generator.gd" id="2_world"]
+[ext_resource type="TileSet" path="res://assets/tiles/world_tileset.tres" id="3_tiles"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_game")
+
+[node name="World" type="Node2D" parent="."]
+script = ExtResource("2_world")
+
+[node name="Background" type="TileMapLayer" parent="World"]
+z_index = -10
+tile_set = ExtResource("3_tiles")
+
+[node name="Decor" type="TileMapLayer" parent="World"]
+z_index = -5
+tile_set = ExtResource("3_tiles")
+
+[node name="Terrain" type="TileMapLayer" parent="World"]
+z_index = -1
+tile_set = ExtResource("3_tiles")

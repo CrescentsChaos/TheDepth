@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sunlit",
+    "name": "Sunlit Shallows",
+    "min_depth": 0,
+    "max_depth": 600,
+    "darkness": 0.0,
+    "pressure": 0.0,
+    "tint": "#4fc3f7"
+  },
+  {
+    "id": "twilight",
+    "name": "Twilight Zone",
+    "min_depth": 600,
+    "max_depth": 1500,
+    "darkness": 0.35,
+    "pressure": 0.0,
+    "tint": "#4a8fd6"
+  },
+  {
+    "id": "midnight",
+    "name": "Midnight Zone",
+    "min_depth": 1500,
+    "max_depth": 2400,
+    "darkness": 0.75,
+    "pressure": 1.6,
+    "tint": "#6a5fd0"
+  },
+  {
+    "id": "abyss",
+    "name": "The Abyss",
+    "min_depth": 2400,
+    "max_depth": 99999,
+    "darkness": 0.92,
+    "pressure": 4.0,
+    "tint": "#b0405a"
+  }
+]
