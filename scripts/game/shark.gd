@@ -2,6 +2,8 @@ class_name Shark
 extends Node2D
 ## The player. Momentum swimming, boost stamina, bite with lunge, hunger, poison/stun,
 ## combo scoring, feeding frenzy, level-ups, surface leaps and pressure damage.
+## The player can be a shark OR any playable creature (see Database.creature_as_player):
+## `diet` decides what a bite can eat (creatures, plankton, algae, carrion ...).
 
 signal died(cause: String)
 
@@ -47,6 +49,20 @@ var frenzy_time := 0.0
 var anim_t := 0.0
 var swim_clock := 0.0
 
+# --- species (shark or any creature)
+var species_id := ""
+var diet := "any"             # any (sharks) carnivore omnivore herbivore plankton filter scavenger
+var prey_ratio := 99.0        # largest prey length as a multiple of our own length
+var eats: Array = []
+var shape_name := "shark"
+var upright := false
+var heading := 1.0
+var cam_base := 1.0           # camera zoom factor for very small / very large species
+var ram_dmg := 0.0            # passive body traits: touching creatures hurts them
+var thorn_dmg := 0.0
+var ram_stun := 0.0
+var _food_acc := 0.0
+
 var _col := Color.WHITE
 var _belly := Color.WHITE
 var _bubbles: CPUParticles2D
@@ -57,7 +73,19 @@ func setup(p_def: Dictionary) -> void:
 	def = p_def
 	_col = Color(str(def["color"]))
 	_belly = Color(str(def["belly"]))
-	_sprites = SpriteSet.for_def("sharks", def)
+	species_id = str(def.get("species_id", def["id"]))
+	diet = str(def.get("diet", "any"))
+	prey_ratio = float(def.get("prey_ratio", 99.0))
+	eats = def.get("eats", [])
+	shape_name = str(def.get("shape", "shark"))
+	upright = CreatureArt.is_upright(shape_name)
+	ram_dmg = float(def.get("contact_damage", 0.0))
+	thorn_dmg = float(def.get("thorns", 0.0))
+	ram_stun = float(def.get("stun", 0.0))
+	var kind := str(def.get("_kind", "sharks"))
+	if kind == "creatures":
+		cam_base = clampf(pow(70.0 / maxf(float(def["length"]), 8.0), 0.35), 0.5, 1.5)
+	_sprites = SpriteSet.for_def(kind, def)
 	if _sprites != null and _sprites.smooth:
 		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	recalc(true)
@@ -123,7 +151,7 @@ func _physics_process(delta: float) -> void:
 		position += velocity * delta
 		facing_angle = lerp_angle(facing_angle, PI, 1.0 - exp(-3.0 * delta))
 		rotation = facing_angle
-		scale.y = 1.0
+		scale = Vector2.ONE
 		queue_redraw()
 		return
 	_timers(delta)
@@ -229,8 +257,15 @@ func _move(delta: float, dir_in: Vector2) -> void:
 	if velocity.length() > 35.0:
 		target_angle = velocity.angle()
 	facing_angle = lerp_angle(facing_angle, target_angle, 1.0 - exp(-9.0 * delta))
-	rotation = facing_angle
-	scale.y = -1.0 if absf(wrapf(facing_angle, -PI, PI)) > PI * 0.5 else 1.0
+	if absf(velocity.x) > 8.0:
+		heading = 1.0 if velocity.x > 0.0 else -1.0
+	if upright:
+		# jellyfish / crabs stay upright and just turn left or right
+		rotation = 0.0
+		scale = Vector2(heading, 1.0)
+	else:
+		rotation = facing_angle
+		scale = Vector2(1.0, -1.0 if absf(wrapf(facing_angle, -PI, PI)) > PI * 0.5 else 1.0)
 	_bubbles.emitting = (not in_air) and velocity.length() > 80.0
 
 
@@ -255,7 +290,7 @@ func _survival(delta: float) -> void:
 	if not in_air:
 		var p := float(Database.biome_at(position.y)["pressure"])
 		if p > 0.0:
-			var resist := minf(Database.upgrade_bonus("pressure_resist"), 0.95)
+			var resist := minf(Database.upgrade_bonus("pressure_resist") + float(def.get("innate_pressure_resist", 0.0)), 0.95)
 			health -= p * (1.0 - resist) * delta
 			_check("Crushing pressure")
 
@@ -270,13 +305,35 @@ func _bite() -> void:
 	Sfx.play("bite")
 	game.shake(1.5)
 	var mouth := global_position + fwd * length * 0.42
+	var hit_creature := false
 	for cr in game.creatures_in_radius(mouth, bite_reach):
-		_bite_creature(cr)
+		if _bite_creature(cr):
+			hit_creature = true
+	# plankton / algae / carrion / marine snow, depending on the diet
+	if not hit_creature:
+		_bite_food(mouth)
 
 
-func _bite_creature(cr: Creature) -> void:
+## What can this character sink its teeth into?
+func can_eat_creature(cr: Creature) -> bool:
 	if cr.dead or not bool(cr.def["edible"]):
-		return
+		return false
+	if cr.behavior == "static":
+		return true                                   # treasure chests are for everybody
+	if diet == "any":
+		return true                                   # sharks: anything, big prey takes more bites
+	if cr.id in eats:
+		return true
+	if not (diet in ["carnivore", "omnivore", "filter"]):
+		return false
+	if cr.behavior in ["fly", "surface"] and diet == "filter":
+		return false
+	return cr.length <= length * prey_ratio
+
+
+func _bite_creature(cr: Creature) -> bool:
+	if not can_eat_creature(cr):
+		return false
 	var ratio := clampf(length / cr.length, 0.3, 1.6)
 	var dmg := bite_dmg * ratio * (1.5 if frenzy_time > 0.0 else 1.0)
 	var killed := cr.hurt(dmg, global_position)
@@ -285,10 +342,45 @@ func _bite_creature(cr: Creature) -> void:
 	if float(cr.def["stun"]) > 0.0:
 		apply_stun(float(cr.def["stun"]))
 	if killed:
-		_eat(cr)
+		eat(cr)
+	return true
 
 
-func _eat(cr: Creature) -> void:
+func _add_frenzy(amount: float) -> void:
+	if frenzy_time > 0.0:
+		return
+	frenzy += amount
+	if frenzy >= 1.0:
+		frenzy = 0.0
+		frenzy_time = 10.0
+		game.on_frenzy()
+
+
+func _bite_food(mouth: Vector2) -> void:
+	var kinds: Array = game.eco.kinds_for(diet)
+	if kinds.is_empty():
+		return
+	var f: Ecosystem.Food = game.eco.in_reach(kinds, mouth, bite_reach)
+	if f == null:
+		return
+	var got: float = game.eco.take(f, clampf(length / 35.0, 1.0, 8.0))
+	if got <= 0.0:
+		return
+	var gain := float(Ecosystem.FOOD_VALUE[f.kind]) * got / maxf(1.0, length / 60.0)
+	hunger = minf(hunger + gain, max_hunger)
+	health = minf(health + gain * 0.3, max_health)
+	_food_acc += got
+	var coins := 0
+	while _food_acc >= 6.0:
+		_food_acc -= 6.0
+		coins += 1
+	_add_frenzy(0.012 * got)
+	gain_xp(got * 0.9)
+	Sfx.play("eat")
+	game.on_food_eaten(f, int(got * 6.0), coins)
+
+
+func eat(cr: Creature) -> void:
 	var d := cr.def
 	hunger = minf(hunger + float(d["hunger"]), max_hunger)
 	health = minf(health + float(d["hunger"]) * 0.35, max_health)
@@ -300,12 +392,7 @@ func _eat(cr: Creature) -> void:
 	var fm := 2.0 if frenzy_time > 0.0 else 1.0
 	var sc := int(float(d["score"]) * cm * fm)
 	var coins := int(round(float(d["coins"]) * (1.0 + Database.upgrade_bonus("coin_bonus")) * fm))
-	if frenzy_time <= 0.0:
-		frenzy += 0.04 + minf(float(d["hunger"]) / 400.0, 0.1)
-		if frenzy >= 1.0:
-			frenzy = 0.0
-			frenzy_time = 10.0
-			game.on_frenzy()
+	_add_frenzy(0.04 + minf(float(d["hunger"]) / 400.0, 0.1))
 	gain_xp(float(d["xp"]))
 	Sfx.play("eat")
 	game.on_eaten(cr, sc, coins, cm)
@@ -338,6 +425,8 @@ func hit_by(cr: Creature, dmg: float) -> void:
 	var st := float(cr.def["stun"])
 	if st > 0.0:
 		apply_stun(st)
+	if thorn_dmg > 0.0:
+		cr.hurt(thorn_dmg, global_position)       # spines hurt whatever bit us
 	velocity += (global_position - cr.global_position).normalized() * 320.0
 
 
@@ -365,7 +454,12 @@ func _draw() -> void:
 	if _sprites != null:
 		_draw_sprite()
 		return
-	CreatureArt.draw(self, "shark", length, col, _belly, anim_t * (1.8 if boosting else 1.0), open)
+	var squash := open if shape_name != "shark" else 0.0
+	if squash > 0.0:
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0 + 0.14 * squash, 1.0 - 0.08 * squash))
+	CreatureArt.draw(self, shape_name, length, col, _belly, anim_t * (1.8 if boosting else 1.0), open)
+	if squash > 0.0:
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Artist sprite path: hurt > attack(bite) > boost > idle > swim.

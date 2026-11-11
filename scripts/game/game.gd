@@ -33,6 +33,9 @@ class Overlay extends Node2D:
 @onready var terrain: TileMapLayer = $World/Terrain
 
 var shark: Shark
+var eco: Ecosystem
+var debug_ai := false
+var pred_events := 0           # creatures eaten by other creatures (stats / tests)
 var camera: Camera2D
 var hud: Hud
 var creatures_root: Node2D
@@ -64,6 +67,9 @@ func _ready() -> void:
 	world_w = float(ws.x * TILE)
 	world_h = float(ws.y * TILE)
 
+	# food sources + day/night live between the world tiles and the creatures
+	eco = Ecosystem.new()
+	add_child(eco)
 	creatures_root = Node2D.new()
 	add_child(creatures_root)
 	projectiles_root = Node2D.new()
@@ -72,10 +78,14 @@ func _ready() -> void:
 
 	shark = Shark.new()
 	shark.game = self
-	shark.position = Vector2(world_w * 0.5, 260.0)
 	shark.z_index = 5
-	shark.setup(Database.shark(str(Save.data["selected_shark"])))
+	shark.setup(Database.selected_def())
+	# every species starts at home: deep-sea fish start deep
+	shark.position = _find_free_spot(Vector2(world_w * 0.5, float(shark.def.get("start_depth", 260.0))), shark.length * 0.5 + 24.0)
 	add_child(shark)
+	if str(shark.def.get("_kind", "sharks")) == "creatures":
+		Save.discover(shark.species_id)
+	eco.setup(self)
 	shark.died.connect(_on_shark_died)
 
 	fx_root = Node2D.new()
@@ -115,6 +125,24 @@ func _ready() -> void:
 	_populate_initial()
 
 
+## First water position at or above `p` (or sideways) that is not inside terrain.
+func _find_free_spot(p: Vector2, r: float) -> Vector2:
+	for xo in [0.0, 250.0, -250.0, 500.0, -500.0, 900.0, -900.0, 1400.0, -1400.0]:
+		for k in 80:
+			var c := Vector2(clampf(p.x + xo, 80.0, world_w - 80.0), p.y - float(k) * 32.0)
+			if c.y < 40.0:
+				break
+			if not is_solid(c, r):
+				return c
+	return Vector2(p.x, 120.0)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
+		debug_ai = not debug_ai
+		hud.show_banner("AI debug view ON  (F3)" if debug_ai else "AI debug view OFF", UI.C_ACCENT)
+
+
 # ---------------------------------------------------------------- loop
 func _physics_process(delta: float) -> void:
 	if not finished:
@@ -132,7 +160,7 @@ func _physics_process(delta: float) -> void:
 func _update_camera(delta: float) -> void:
 	var target := shark.global_position + shark.velocity * 0.3
 	camera.position = camera.position.lerp(target, 1.0 - exp(-6.0 * delta))
-	var z := 1.0 / (1.0 + 0.035 * float(shark.level - 1))
+	var z := shark.cam_base / (1.0 + 0.035 * float(shark.level - 1))
 	if shark.boosting:
 		z *= 0.92
 	camera.zoom = camera.zoom.lerp(Vector2(z, z), 1.0 - exp(-2.0 * delta))
@@ -145,10 +173,12 @@ func _update_camera(delta: float) -> void:
 
 func _update_darkness(delta: float) -> void:
 	var biome := Database.biome_at(shark.global_position.y)
-	_dark_cur = lerpf(_dark_cur, float(biome["darkness"]), 1.0 - exp(-1.5 * delta))
+	# nights are dark in the shallows too (fades out with depth, where it is dark anyway)
+	var night_dark := eco.night_amount() * 0.55 * clampf(1.0 - shark.global_position.y / 1600.0, 0.0, 1.0)
+	_dark_cur = lerpf(_dark_cur, maxf(float(biome["darkness"]), night_dark), 1.0 - exp(-1.5 * delta))
 	var vp := get_viewport_rect().size
 	var screen := get_viewport().get_canvas_transform() * shark.global_position
-	var light := 1.0 + Database.upgrade_bonus("light")
+	var light := 1.0 + Database.upgrade_bonus("light") + float(shark.def.get("innate_light", 0.0))
 	var world_r := 360.0 * light * (1.0 + 0.04 * float(shark.level - 1))
 	dark_mat.set_shader_parameter("center", screen / vp)
 	dark_mat.set_shader_parameter("aspect", vp.x / vp.y)
@@ -321,14 +351,25 @@ func _interactions(delta: float) -> void:
 		var d := sp.distance_to(cr.global_position)
 		if d < 650.0:
 			Save.discover(cr.id)
-		if pull > 0.0 and d < pull and bool(cr.def["edible"]) and cr.length < shark.length * 0.6 and cr.hp <= shark.bite_dmg:
+		if pull > 0.0 and d < pull and shark.can_eat_creature(cr) and cr.length < shark.length * 0.6 and cr.hp <= shark.bite_dmg:
 			cr.position += (sp - cr.global_position).normalized() * 110.0 * delta
 		var contact_r := (shark.length + cr.length) * 0.28
 		if d < contact_r and cr.contact_cd <= 0.0:
-			var dmg := float(cr.def["contact_damage"])
+			var dmg := cr.attack_damage_vs(shark)
 			if dmg > 0.0 and cr.stun <= 0.0:
 				cr.contact_cd = 1.0
 				shark.hit_by(cr, dmg)
+		# body traits of the species we are playing (electric shock, rams, ...)
+		if shark.ram_dmg > 0.0 and d < contact_r and cr.ram_cd <= 0.0 and bool(cr.def["edible"]):
+			cr.ram_cd = 0.8
+			var killed := cr.hurt(shark.ram_dmg * 0.6, sp)
+			if shark.ram_stun > 0.0:
+				cr.stun = maxf(cr.stun, shark.ram_stun * 0.5)
+			if killed:
+				if shark.can_eat_creature(cr):
+					shark.eat(cr)
+				else:
+					on_predation(shark, cr)
 
 
 func on_eaten(cr: Creature, sc: int, coins: int, mult: float) -> void:
@@ -342,6 +383,25 @@ func on_eaten(cr: Creature, sc: int, coins: int, mult: float) -> void:
 	burst(cr.global_position, cr.color.lerp(Color("#d03030"), 0.5), 12)
 	shake(2.5)
 	cr.remove()
+
+
+## A creature killed another creature (not the player): puff of blood, scraps for scavengers.
+func on_predation(_pred: Node, prey: Creature) -> void:
+	if prey.dead:
+		return
+	pred_events += 1
+	if shark.global_position.distance_to(prey.global_position) < 1500.0:
+		burst(prey.global_position, prey.color.lerp(Color("#d03030"), 0.5), 8)
+		eco.add_carrion(prey.global_position, prey.length * 0.8)
+	prey.remove()
+
+
+func on_food_eaten(f: Ecosystem.Food, sc: int, coins: int) -> void:
+	score += sc
+	coins_run += coins
+	if sc > 0:
+		floating_text(shark.global_position + Vector2(0.0, -shark.length * 0.5), "+%d" % sc, Color("#9be8a8"), 16)
+	burst(f.pos, Color(0.8, 1.0, 0.85), 3)
 
 
 func on_level_up(lv: int) -> void:
@@ -430,11 +490,22 @@ func draw_overlay(c: Node2D) -> void:
 		if cr == null or cr.dead:
 			continue
 		var top := cr.position + Vector2(0.0, -cr.length * 0.45 - 12.0)
+		if cr.sleeping and sp.distance_to(cr.position) < 900.0:
+			var bob := sin(run_time * 2.0 + cr.phase) * 3.0
+			c.draw_string(font, top + Vector2(6.0, -2.0 + bob), "z", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.85, 0.95, 1.0, 0.8))
+			c.draw_string(font, top + Vector2(16.0, -12.0 - bob), "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(0.85, 0.95, 1.0, 0.9))
+		if debug_ai and sp.distance_to(cr.position) < 1100.0:
+			var tag := "%s%s  hun %d%%  en %d%%" % [cr.mode, " (zz)" if cr.sleeping else "", int(cr.hunger * 100.0), int(cr.energy * 100.0)]
+			c.draw_string(font, cr.position + Vector2(-50.0, cr.length * 0.45 + 26.0), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1.0, 1.0, 0.6))
+			if cr.target != null and is_instance_valid(cr.target):
+				c.draw_line(cr.position, cr.target.position, Color(1.0, 0.3, 0.3, 0.7), 2.0)
+			elif cr.target_food != null and cr.mode in ["forage", "graze"]:
+				c.draw_line(cr.position, cr.target_food.pos, Color(0.4, 1.0, 0.5, 0.7), 2.0)
 		if cr.hp < cr.max_hp and cr.max_hp > 1.5:
 			var w := maxf(cr.length * 0.5, 30.0)
 			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w, 5.0), Color(0, 0, 0, 0.6))
 			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w * cr.hp / cr.max_hp, 5.0), Color("#ff5a4a"))
-		if shark.alive and float(cr.def["contact_damage"]) > 0.0 and cr.stun <= 0.0 and sp.distance_to(cr.position) < 650.0:
+		if shark.alive and cr.attack_damage_vs(shark) > 0.0 and cr.stun <= 0.0 and sp.distance_to(cr.position) < 650.0:
 			var p := top + Vector2(0.0, -20.0)
 			c.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -13), p + Vector2(13, 11), p + Vector2(-13, 11)]), Color("#ff4a3a"))
 			c.draw_string(font, p + Vector2(-4, 9), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)

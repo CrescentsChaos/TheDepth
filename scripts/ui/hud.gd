@@ -64,6 +64,8 @@ func _ready() -> void:
 	_score = _rlabel("Score 0", 30)
 	_coins = _rlabel("Coins 0", 22)
 	_depth = _rlabel("Depth 0 m", 20)
+	_clock = _rlabel("", 18)
+	_clock.add_theme_color_override("font_color", UI.C_DIM)
 	_combo = _rlabel("", 26)
 	_combo.add_theme_color_override("font_color", UI.C_GOLD)
 
@@ -75,10 +77,24 @@ func _ready() -> void:
 	_banner.modulate.a = 0.0
 	_root.add_child(_banner)
 
-	_hint = UI.label("WASD / mouse: swim   •   LMB / Space: bite   •   RMB / Shift: boost   •   Esc: pause\nEat smaller creatures, avoid bigger ones (watch for the red !). Leap out of the water to catch gulls.", 18, UI.C_DIM)
+	var tip := "Eat smaller creatures, avoid bigger ones (watch for the red !). Leap out of the water to catch gulls."
+	var dt := str(game.shark.diet)
+	if dt in ["plankton", "filter"]:
+		tip = "You eat plankton: bite the drifting green clouds. Predators eat YOU - stay with the school and flee!"
+	elif dt == "herbivore":
+		tip = "You graze: bite the green shimmer on coral and kelp. Predators eat YOU - hide near the reef!"
+	elif dt == "scavenger":
+		tip = "You scavenge: bite carrion and marine snow on the sea floor. Avoid hunters!"
+	elif dt == "omnivore":
+		tip = "You eat algae, plankton and small prey. Bigger fish will hunt you."
+	tip += "   F3: AI debug view"
+	_hint = UI.label("WASD / mouse: swim   •   LMB / Space: bite   •   RMB / Shift: boost   •   Esc: pause\n" + tip, 18, UI.C_DIM)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.custom_minimum_size = Vector2(1000, 0)
 	_root.add_child(_hint)
+
+
+var _clock: Label
 
 
 func _bar(col: Color) -> HudBar:
@@ -122,6 +138,7 @@ func _process(_delta: float) -> void:
 	_score.text = "Score %s" % _commas(game.score)
 	_coins.text = "Coins %d  (bank %d)" % [game.coins_run, Save.coins()]
 	_depth.text = "Depth %d m" % int(maxf(s.global_position.y, 0.0) / 10.0)
+	_clock.text = game.eco.clock_text()
 	if s.combo >= 2:
 		_combo.text = "COMBO x%d   score x%.1f" % [s.combo, s.combo_mult()]
 		_combo.modulate.a = clampf(s.combo_timer, 0.25, 1.0)
@@ -207,7 +224,7 @@ func show_game_over(info: Dictionary) -> void:
 	var lines := [
 		"Score: %s%s" % [_commas(int(info["score"])), "   NEW BEST!" if bool(info["new_best"]) else "   (best %s)" % _commas(int(info["best"]))],
 		"Creatures eaten: %d" % int(info["eaten"]),
-		"Shark level: %d" % int(info["level"]),
+		"Level: %d" % int(info["level"]),
 		"Time: %d:%02d" % [secs / 60, secs % 60],
 		"Coins earned: %d" % int(info["coins"]),
 	]

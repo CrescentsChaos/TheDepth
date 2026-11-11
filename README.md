@@ -72,3 +72,13 @@ scripts/game/         game.gd, shark.gd, creature.gd, creature_art.gd, world_gen
 scripts/ui/           main_menu.gd (title, sharks, upgrades, bestiary, settings), hud.gd (HUD, pause, game over)
 ```
 Creature visuals are procedural vector shapes (`shape`: fish, shark, whale, eel, jelly, crab, ray, turtle, puffer, squid, angler, chest, bird, boat, diver). To add a new shape, add a draw function in `creature_art.gd`.
+
+
+## New: living ocean + play as any fish
+
+- **Smarter creatures**: hunger/energy needs, day & night (fish sleep, nocturnal hunters wake up,
+  plankton and migrating fish rise at night), real predator-prey food chain, schools that flee
+  together, territories and dens, dolphins leaping, gulls diving for fish, boats anchoring at night.
+- **Play as any fish**: main menu -> CHOOSE FISH -> "ANY FISH / CREATURE" tab. Your diet decides how
+  you eat (plankton, algae, carrion or smaller fish). F3 toggles an AI debug overlay.
+- Fields and tuning: see the "Life routine & ecosystem" and "Playing as any creature" sections in `data/DATABASE.md`.

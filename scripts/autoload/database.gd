@@ -18,6 +18,11 @@ const CREATURE_DEFAULTS := {
 	"projectile_damage": 12.0, "sprite": "", "tags": [],
 	"sprite_frames": 1, "sprite_fps": 8.0, "sprite_scale": 1.0,
 	"sprite_faces_left": false, "sprite_smooth": false, "sprite_autosize": true, "sprite_wiggle": 0.0,
+	# --- life / AI (see data/DATABASE.md)
+	"diet": "none", "eats": [], "prey_ratio": 0.5, "activity": "any", "rest_style": "open",
+	"territorial": false, "migrates": false, "leaps": false,
+	# --- playable
+	"playable": true, "cost": 0, "player": {},
 }
 const SHARK_DEFAULTS := {
 	"name": "Shark", "description": "", "color": "#6f8fa8", "belly": "#e6eef3",
@@ -113,6 +118,89 @@ func shark(id: String) -> Dictionary:
 	if _shark_idx.has(id):
 		return _shark_idx[id]
 	return sharks[0]
+
+
+## True for creatures that can be chosen as the player's character.
+func is_playable(c: Dictionary) -> bool:
+	return bool(c.get("playable", true))
+
+
+## Everything the player can choose: id -> {kind, def}. Sharks first, then every playable species.
+func player_def(kind: String, id: String) -> Dictionary:
+	if kind == "fish" and _creature_idx.has(id) and is_playable(_creature_idx[id]):
+		return creature_as_player(_creature_idx[id])
+	var s := shark(id).duplicate(true)
+	s["_kind"] = "sharks"
+	s["diet"] = "any"
+	s["prey_ratio"] = 2.4
+	s["shape"] = "shark"
+	s["species_id"] = str(s["id"])
+	return s
+
+
+## The def of whatever the player has selected in the menu.
+func selected_def() -> Dictionary:
+	var fish := str(Save.data.get("selected_fish", ""))
+	if fish != "" and _creature_idx.has(fish) and is_playable(_creature_idx[fish]):
+		return player_def("fish", fish)
+	return player_def("shark", str(Save.data["selected_shark"]))
+
+
+## Turns a creature entry into a shark-style player def. The derived numbers keep the
+## original shark roughly where it was (length 70 -> bite 2.0, speed 300, health 100) and
+## scale smoothly for tiny sardines and huge whales. Any key inside the creature's
+## "player" object overrides the derived value, so you can hand-tune one species.
+func creature_as_player(c: Dictionary) -> Dictionary:
+	var L := float(c["length"])
+	var hp := float(c["hp"])
+	var spd := float(c["speed"])
+	var diet := str(c["diet"])
+	var hunts := diet in ["carnivore", "omnivore"]
+	var d := {
+		"id": str(c["id"]), "species_id": str(c["id"]), "_kind": "creatures",
+		"name": str(c["name"]), "description": str(c["description"]),
+		"shape": str(c["shape"]), "color": str(c["color"]), "belly": str(c["accent"]),
+		"length": L, "diet": diet, "eats": c["eats"], "activity": str(c["activity"]),
+		"prey_ratio": float(c["prey_ratio"]) if hunts or diet == "filter" else 0.0,
+		"speed": clampf(spd * 2.0 + 40.0, 115.0, 480.0),
+		"accel": clampf(700.0 + spd * 2.0 - L * 0.6, 380.0, 1100.0),
+		"boost_mult": 1.35 if L > 300.0 else (1.8 if str(c["behavior"]) == "ambush" else 1.6),
+		"bite_damage": maxf(L / 35.0, 1.0) * (1.3 if hunts else 1.0),
+		"bite_range": maxf(L * 0.62, 20.0),
+		"max_health": maxf(60.0, 45.0 + 11.0 * pow(hp, 0.75) + L * 0.15),
+		"max_hunger": 100.0,
+		"hunger_drain": {"carnivore": 2.6, "omnivore": 2.5, "herbivore": 2.4, "plankton": 2.7, "filter": 2.6, "scavenger": 2.0}.get(diet, 2.5),
+		"stamina": 100.0 + clampf(spd - 100.0, 0.0, 100.0) * 0.4,
+		"cost": int(c["cost"]), "stun_resist": 0.8 if float(c["stun"]) > 0.0 else 0.0,
+		# passive body traits of the species
+		"contact_damage": float(c["contact_damage"]), "thorns": float(c["thorns"]),
+		"stun": float(c["stun"]), "poison": float(c["poison"]),
+		# species that live in the deep are built for it
+		"innate_pressure_resist": 0.92 if float(c["min_depth"]) >= 1000.0 else (0.5 if float(c["min_depth"]) >= 500.0 else 0.0),
+		"innate_light": 0.6 if float(c["min_depth"]) >= 1000.0 else (0.25 if float(c["min_depth"]) >= 500.0 else 0.0),
+		"start_depth": clampf(float(c["min_depth"]) + 200.0, 260.0, 2800.0),
+		"sprite": str(c["sprite"]), "sprite_frames": c["sprite_frames"], "sprite_fps": c["sprite_fps"],
+		"sprite_scale": c["sprite_scale"], "sprite_faces_left": c["sprite_faces_left"],
+		"sprite_smooth": c["sprite_smooth"], "sprite_autosize": c["sprite_autosize"], "sprite_wiggle": c["sprite_wiggle"],
+		"behavior": str(c["behavior"]), "tags": c["tags"],
+	}
+	var over: Variant = c.get("player", {})
+	if over is Dictionary:
+		d.merge(over, true)
+	return d
+
+
+## Short text for the character menu: what this species eats.
+func diet_text(d: Dictionary) -> String:
+	match str(d.get("diet", "none")):
+		"any": return "Eats: anything that fits in its jaws"
+		"carnivore": return "Eats: smaller fish and sea life"
+		"omnivore": return "Eats: algae, plankton and small prey"
+		"herbivore": return "Eats: algae on reefs and kelp"
+		"plankton": return "Eats: drifting plankton"
+		"filter": return "Eats: plankton and tiny fish (filter feeder)"
+		"scavenger": return "Eats: carrion and sea-floor debris"
+	return "Eats: nothing special"
 
 
 func biome_at(y: float) -> Dictionary:

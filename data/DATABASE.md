@@ -43,3 +43,41 @@ id, name, min_depth, max_depth (px), darkness (0..1, 1 = nearly black outside yo
 ## upgrades.json
 id, name, description, stat, per_level, max_level, base_cost, cost_growth (cost = base * growth^level).
 Stats: bite_damage, speed, stamina, max_health, max_hunger, hunger_efficiency, light, pressure_resist, coin_bonus, pull. To add a *new* stat, read it in code with `Database.upgrade_bonus("your_stat")`.
+
+
+## Life routine & ecosystem fields (creatures.json)
+
+Every creature runs a life-routine brain (see `scripts/game/creature.gd`) driven by these
+optional fields. `behavior` still picks the body style; these pick what the animal *does*.
+
+| field | values | meaning |
+|---|---|---|
+| `diet` | `carnivore` `omnivore` `herbivore` `plankton` `filter` `scavenger` `none` | what it eats. Carnivores hunt creatures, herbivores graze algae on coral/kelp tiles, plankton/filter feeders work drifting plankton clouds, scavengers eat carrion and deep-sea marine snow |
+| `prey_ratio` | number (default 0.5) | a carnivore hunts creatures up to `length * prey_ratio` (never toxic/spiny ones) |
+| `eats` | list of ids | always-edible prey regardless of size (turtle eats `jellyfish`, gulls dive for `sardine`...) |
+| `activity` | `diurnal` `nocturnal` `crepuscular` `any` | when it is awake. Others sleep (you see "z Z") and are easy prey |
+| `rest_style` | `open` `reef` `floor` | where it sleeps: right where it is, in a coral/kelp den, or on the sea floor |
+| `territorial` | bool | defends its home patch and chases smaller intruders away |
+| `migrates` | bool | daily vertical migration: rises toward the surface at night, sinks by day |
+| `leaps` | bool | jumps out of the water now and then (dolphin) |
+| tag `curious` | in `tags` | circles the player to have a look when not afraid |
+
+Day length is `Ecosystem.DAY_LENGTH` (300 s). A creature's day: sleep at its quiet hours, wake,
+get hungry (needs rise over time), look for food (hunt / graze / scavenge), flee from anything
+that can eat it (schools bolt together via alarm calls), otherwise roam its home range,
+visit food patches, hover, patrol, or lurk. Predators that eat get full and leave prey alone for a while.
+Press **F3** in game for the AI debug view (state, hunger, energy, targets).
+
+## Playing as any creature
+
+Every creature is playable unless it has `"playable": false` (gull, diver, boat, chest).
+`Database.creature_as_player()` derives the player stats from the creature entry
+(speed, health, bite, reach, hunger drain by diet, deep-sea pressure/light immunity,
+start depth...). To hand-tune one species add a `"player"` object whose keys override the
+derived values, e.g. `"player": {"speed": 380, "bite_damage": 3.0, "max_health": 140}`.
+Add `"cost": 500` to make a species cost coins in the character menu (default 0 = free).
+
+What a bite can eat depends on the diet: carnivores/omnivores bite creatures up to
+`length * prey_ratio`; plankton/filter eaters bite plankton clouds; herbivores bite algae;
+scavengers bite carrion and marine snow. Body traits carry over: `contact_damage`
+(electric eel shocks what it touches), `thorns`, `stun`.

@@ -18,7 +18,11 @@
     "hunger": 5,
     "coins": 1,
     "score": 10,
-    "flee_range": 280
+    "flee_range": 280,
+    "diet": "plankton",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "migrates": false
   },
   {
     "id": "clownfish",
@@ -37,7 +41,12 @@
     "hunger": 6,
     "coins": 2,
     "score": 20,
-    "flee_range": 220
+    "flee_range": 220,
+    "diet": "omnivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "territorial": true,
+    "prey_ratio": 0.2
   },
   {
     "id": "mackerel",
@@ -58,7 +67,11 @@
     "hunger": 9,
     "coins": 2,
     "score": 30,
-    "flee_range": 300
+    "flee_range": 300,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "prey_ratio": 0.6
   },
   {
     "id": "pufferfish",
@@ -79,16 +92,34 @@
     "coins": 5,
     "score": 60,
     "thorns": 8,
-    "poison": 4
+    "poison": 4,
+    "diet": "herbivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "territorial": true
   },
   {
-D    "speed": 150,
+    "id": "tuna",
+    "name": "Tuna",
+    "description": "Powerful and quick.",
+    "length": 96,
+    "color": "#2f5f8c",
+    "accent": "#c8d8e4",
+    "min_depth": 100,
+    "max_depth": 1000,
+    "weight": 5,
+    "max_count": 6,
+    "speed": 150,
     "hp": 3,
     "xp": 28,
     "hunger": 18,
     "coins": 6,
     "score": 90,
-    "flee_range": 350
+    "flee_range": 350,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.5
   },
   {
     "id": "jellyfish",
@@ -110,7 +141,11 @@ D    "speed": 150,
     "coins": 3,
     "score": 40,
     "contact_damage": 7,
-    "poison": 3
+    "poison": 3,
+    "diet": "plankton",
+    "activity": "any",
+    "rest_style": "open",
+    "migrates": true
   },
   {
     "id": "sea_turtle",
@@ -129,7 +164,14 @@ D    "speed": 150,
     "xp": 60,
     "hunger": 30,
     "coins": 12,
-    "score": 160
+    "score": 160,
+    "diet": "omnivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "prey_ratio": 0.0,
+    "eats": [
+      "jellyfish"
+    ]
   },
   {
     "id": "stingray",
@@ -149,7 +191,16 @@ D    "speed": 150,
     "hunger": 24,
     "coins": 10,
     "score": 140,
-    "thorns": 10
+    "thorns": 10,
+    "diet": "carnivore",
+    "activity": "nocturnal",
+    "rest_style": "floor",
+    "prey_ratio": 0.0,
+    "eats": [
+      "crab",
+      "isopod",
+      "clownfish"
+    ]
   },
   {
     "id": "barracuda",
@@ -170,7 +221,11 @@ D    "speed": 150,
     "coins": 15,
     "score": 220,
     "contact_damage": 14,
-    "aggro_range": 520
+    "aggro_range": 520,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "prey_ratio": 0.5
   },
   {
     "id": "dolphin",
@@ -189,13 +244,18 @@ D    "speed": 150,
     "hunger": 40,
     "coins": 25,
     "score": 320,
-    "flee_range": 400
+    "flee_range": 400,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "prey_ratio": 0.38,
+    "leaps": true
   },
   {
     "id": "seagull",
     "name": "Seagull",
     "description": "Leap out of the water to catch one!",
-d"length": 34,
+    "length": 34,
     "shape": "bird",
     "color": "#f2f2f2",
     "accent": "#9aa4ad",
@@ -208,7 +268,17 @@ d"length": 34,
     "hunger": 10,
     "coins": 4,
     "score": 70,
-    "flee_range": 260
+    "flee_range": 260,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "prey_ratio": 0.0,
+    "eats": [
+      "sardine",
+      "clownfish",
+      "mackerel"
+    ],
+    "playable": false
   },
   {
     "id": "diver",
@@ -230,7 +300,11 @@ d"length": 34,
     "coins": 20,
     "score": 200,
     "aggro_range": 650,
-    "projectile_damage": 14
+    "projectile_damage": 14,
+    "diet": "none",
+    "activity": "diurnal",
+    "rest_style": "open",
+    "playable": false
   },
   {
     "id": "fishing_boat",
@@ -248,7 +322,11 @@ d"length": 34,
     "xp": 220,
     "hunger": 60,
     "coins": 80,
-    "score": 800
+    "score": 800,
+    "diet": "none",
+    "activity": "any",
+    "rest_style": "open",
+    "playable": false
   },
   {
     "id": "crab",
@@ -269,7 +347,10 @@ d"length": 34,
     "hunger": 8,
     "coins": 4,
     "score": 50,
-    "flee_range": 150
+    "flee_range": 150,
+    "diet": "scavenger",
+    "activity": "nocturnal",
+    "rest_style": "floor"
   },
   {
     "id": "lanternfish",
@@ -290,7 +371,11 @@ d"length": 34,
     "hunger": 6,
     "coins": 2,
     "score": 30,
-    "flee_range": 260
+    "flee_range": 260,
+    "diet": "plankton",
+    "activity": "any",
+    "rest_style": "open",
+    "migrates": true
   },
   {
     "id": "squid",
@@ -310,7 +395,12 @@ d"length": 34,
     "hunger": 22,
     "coins": 9,
     "score": 130,
-    "flee_range": 380
+    "flee_range": 380,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "migrates": true,
+    "prey_ratio": 0.45
   },
   {
     "id": "moray_eel",
@@ -332,7 +422,12 @@ d"length": 34,
     "coins": 16,
     "score": 260,
     "contact_damage": 18,
-    "aggro_range": 360
+    "aggro_range": 360,
+    "diet": "carnivore",
+    "activity": "nocturnal",
+    "rest_style": "reef",
+    "territorial": true,
+    "prey_ratio": 0.5
   },
   {
     "id": "electric_eel",
@@ -353,7 +448,11 @@ d"length": 34,
     "coins": 18,
     "score": 280,
     "contact_damage": 8,
-    "stun": 1.6
+    "stun": 1.6,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "reef",
+    "prey_ratio": 0.4
   },
   {
     "id": "rival_tiger",
@@ -368,36 +467,18 @@ d"length": 34,
     "weight": 2,
     "max_count": 2,
     "behavior": "hunter",
-    "speed": 200,
+    "speed": 230,
     "hp": 14,
     "xp": 220,
     "hunger": 55,
     "coins": 45,
     "score": 600,
     "contact_damage": 24,
-    "aggro_range": 620
-  },
-  {
-    "id": "rival_great_white",
-    "name": "Great White Shark",
-    "description": "The ultimate ocean predator.",
-    "length": 250,
-    "shape": "shark",
-    "color": "#6c7f8f",
-    "accent": "#dfe6ea",
-    "min_depth": 300,
-    "max_depth": 1700,
-    "weight": 2,
-    "max_count": 2,
-    "behavior": "hunter",
-    "speed": 180,
-    "hp": 14,
-    "xp": 220,
-    "hunger": 55,
-    "coins": 45,
-    "score": 600,
-    "contact_damage": 24,
-    "aggro_range": 620
+    "aggro_range": 620,
+    "diet": "carnivore",
+    "activity": "crepuscular",
+    "rest_style": "open",
+    "prey_ratio": 0.55
   },
   {
     "id": "manta_ray",
@@ -416,13 +497,17 @@ d"length": 34,
     "xp": 120,
     "hunger": 45,
     "coins": 28,
-    "score": 400
+    "score": 400,
+    "diet": "filter",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.1
   },
   {
     "id": "blue_whale",
     "name": "Blue Whale",
     "description": "The biggest meal in the ocean.",
-    "length": 1500,
+    "length": 520,
     "shape": "whale",
     "color": "#4f6f94",
     "accent": "#c6d3e0",
@@ -435,7 +520,11 @@ d"length": 34,
     "xp": 450,
     "hunger": 100,
     "coins": 150,
-    "score": 2000
+    "score": 2000,
+    "diet": "filter",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.1
   },
   {
     "id": "anglerfish",
@@ -457,7 +546,11 @@ d"length": 34,
     "coins": 30,
     "score": 450,
     "contact_damage": 22,
-    "aggro_range": 380
+    "aggro_range": 380,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.6
   },
   {
     "id": "viperfish",
@@ -478,7 +571,12 @@ d"length": 34,
     "coins": 14,
     "score": 240,
     "contact_damage": 12,
-    "aggro_range": 420
+    "aggro_range": 420,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "migrates": true,
+    "prey_ratio": 0.5
   },
   {
     "id": "gulper_eel",
@@ -498,7 +596,11 @@ d"length": 34,
     "hunger": 50,
     "coins": 35,
     "score": 520,
-    "contact_damage": 10
+    "contact_damage": 10,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.5
   },
   {
     "id": "blobfish",
@@ -516,7 +618,10 @@ d"length": 34,
     "xp": 30,
     "hunger": 14,
     "coins": 8,
-    "score": 120
+    "score": 120,
+    "diet": "scavenger",
+    "activity": "any",
+    "rest_style": "floor"
   },
   {
     "id": "oarfish",
@@ -528,14 +633,17 @@ d"length": 34,
     "accent": "#ff4a4a",
     "min_depth": 900,
     "max_depth": 2200,
-    "weight": 0.1,
+    "weight": 2,
     "max_count": 2,
     "speed": 60,
     "hp": 7,
     "xp": 140,
     "hunger": 40,
     "coins": 30,
-    "score": 480
+    "score": 480,
+    "diet": "plankton",
+    "activity": "any",
+    "rest_style": "open"
   },
   {
     "id": "giant_squid",
@@ -557,7 +665,11 @@ d"length": 34,
     "coins": 90,
     "score": 1500,
     "contact_damage": 30,
-    "aggro_range": 600
+    "aggro_range": 600,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.5
   },
   {
     "id": "isopod",
@@ -577,7 +689,10 @@ d"length": 34,
     "xp": 25,
     "hunger": 10,
     "coins": 6,
-    "score": 80
+    "score": 80,
+    "diet": "scavenger",
+    "activity": "any",
+    "rest_style": "floor"
   },
   {
     "id": "treasure_chest",
@@ -599,7 +714,11 @@ d"length": 34,
     "score": 250,
     "tags": [
       "treasure"
-    ]
+    ],
+    "diet": "none",
+    "activity": "any",
+    "rest_style": "open",
+    "playable": false
   },
   {
     "id": "leviathan",
@@ -621,6 +740,10 @@ d"length": 34,
     "coins": 500,
     "score": 6000,
     "contact_damage": 45,
-    "aggro_range": 900
+    "aggro_range": 900,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "open",
+    "prey_ratio": 0.45
   }
 ]

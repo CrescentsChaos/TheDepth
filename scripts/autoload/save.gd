@@ -8,6 +8,8 @@ const DEFAULTS := {
 	"total_eaten": 0,
 	"runs": 0,
 	"selected_shark": "reef_shark",
+	"fish_unlocked": [],   # creature ids bought via an optional "cost" in creatures.json
+	"selected_fish": "",   # non-empty = playing as this creature id instead of a shark
 	"unlocked_sharks": ["reef_shark"],
 	"upgrades": {},
 	"discovered": [],

@@ -1,5 +1,5 @@
 extends Control
-## Title screen + Sharks / Upgrades / Bestiary / Settings pages.
+## Title screen + Characters / Upgrades / Bestiary / Settings pages.
 
 class Backdrop extends Control:
 	var t := 0.0
@@ -9,7 +9,8 @@ class Backdrop extends Control:
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		shark_sprites = SpriteSet.for_def("sharks", Database.shark(str(Save.data["selected_shark"])))
+		var sel := Database.selected_def()
+		shark_sprites = SpriteSet.for_def(str(sel.get("_kind", "sharks")), sel)
 		var pool: Array = []
 		for d in Database.creatures:
 			if not (str(d["behavior"]) in ["surface", "fly", "static", "bottom"]):
@@ -71,7 +72,7 @@ class Backdrop extends Control:
 		if shark_sprites != null:
 			shark_sprites.draw(self, 420.0, t, "swim", true, true, Color(0.03, 0.08, 0.15, 0.85))
 		else:
-			CreatureArt.draw(self, "shark", 420.0, Color(0.03, 0.08, 0.15, 0.85), Color(0.05, 0.12, 0.2, 0.85), t)
+			CreatureArt.draw(self, str(Database.selected_def().get("shape", "shark")), 420.0, Color(0.03, 0.08, 0.15, 0.85), Color(0.05, 0.12, 0.2, 0.85), t)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 var _margin: MarginContainer
@@ -157,7 +158,7 @@ func _page_main() -> void:
 	gap.custom_minimum_size = Vector2(0, 20)
 	box.add_child(gap)
 	box.add_child(UI.button("PLAY", func(): get_tree().change_scene_to_file("res://scenes/game.tscn")))
-	box.add_child(UI.button("SHARKS", func(): _goto("sharks")))
+	box.add_child(UI.button("CHOOSE FISH", func(): _goto("sharks")))
 	box.add_child(UI.button("UPGRADES", func(): _goto("shop")))
 	box.add_child(UI.button("BESTIARY", func(): _goto("bestiary")))
 	box.add_child(UI.button("SETTINGS", func(): _goto("settings")))
@@ -168,8 +169,26 @@ func _page_main() -> void:
 
 
 # ---------------------------------------------------------------- sharks
+var _char_tab := "sharks"
+
+
 func _page_sharks() -> void:
-	var outer := _sub_page("CHOOSE YOUR SHARK")
+	var outer := _sub_page("CHOOSE YOUR CHARACTER")
+	# the tab starts on whatever you are currently playing
+	if _char_tab == "" or (str(Save.data.get("selected_fish", "")) != "" and not _tab_touched):
+		_char_tab = "fish" if str(Save.data.get("selected_fish", "")) != "" else "sharks"
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 12)
+	var b1 := UI.button("SHARKS", _set_tab.bind("sharks"), 260.0)
+	b1.disabled = _char_tab == "sharks"
+	var b2 := UI.button("ANY FISH / CREATURE", _set_tab.bind("fish"), 360.0)
+	b2.disabled = _char_tab == "fish"
+	tabs.add_child(b1)
+	tabs.add_child(b2)
+	outer.add_child(tabs)
+	if _char_tab == "fish":
+		_fish_tab(outer)
+		return
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -177,6 +196,7 @@ func _page_sharks() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	scroll.add_child(row)
+	var playing_fish := str(Save.data.get("selected_fish", "")) != ""
 	for s in Database.sharks:
 		var id := str(s["id"])
 		var card := PanelContainer.new()
@@ -198,7 +218,7 @@ func _page_sharks() -> void:
 		desc.custom_minimum_size = Vector2(220, 70)
 		cv.add_child(desc)
 		cv.add_child(UI.label("Bite %.1f   Reach %d\nSpeed %d   Boost x%.1f\nHealth %d   Stamina %d" % [float(s["bite_damage"]), int(s["bite_range"]), int(s["speed"]), float(s["boost_mult"]), int(s["max_health"]), int(s["stamina"])], 17))
-		if str(Save.data["selected_shark"]) == id:
+		if str(Save.data["selected_shark"]) == id and not playing_fish:
 			var b := UI.button("SELECTED", _noop, 220.0)
 			b.disabled = true
 			cv.add_child(b)
@@ -210,6 +230,64 @@ func _page_sharks() -> void:
 			b.disabled = Save.coins() < cost
 			cv.add_child(b)
 		row.add_child(card)
+
+
+var _tab_touched := false
+
+
+func _set_tab(tab: String) -> void:
+	_char_tab = tab
+	_tab_touched = true
+	_goto("sharks")
+
+
+## Every creature in the database that can be played, as a scrolling grid of cards.
+func _fish_tab(outer: VBoxContainer) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	outer.add_child(scroll)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 14)
+	scroll.add_child(grid)
+	var cur := str(Save.data.get("selected_fish", ""))
+	for c in Database.creatures:
+		if not Database.is_playable(c):
+			continue
+		var p := Database.creature_as_player(c)
+		var id := str(c["id"])
+		var card := PanelContainer.new()
+		card.custom_minimum_size = Vector2(300, 0)
+		var cv := VBoxContainer.new()
+		cv.add_theme_constant_override("separation", 6)
+		card.add_child(cv)
+		var pv := ArtPreview.new()
+		pv.custom_minimum_size = Vector2(260, 90)
+		pv.shape = str(c["shape"])
+		pv.body_len = minf(float(c["length"]), 260.0)
+		pv.color = Color(str(c["color"]))
+		pv.accent = Color(str(c["accent"]))
+		pv.sprites = SpriteSet.for_def("creatures", c)
+		cv.add_child(pv)
+		cv.add_child(UI.label(str(c["name"]), 24, UI.C_ACCENT))
+		var diet := UI.label(Database.diet_text(p), 15, UI.C_GOLD)
+		diet.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		cv.add_child(diet)
+		cv.add_child(UI.label("Size %d   Speed %d   Health %d\nBite %.1f   Lives at %d-%d m" % [int(c["length"]), int(p["speed"]), int(p["max_health"]), float(p["bite_damage"]), int(float(c["min_depth"]) / 10.0), int(float(c["max_depth"]) / 10.0)], 15))
+		var cost := int(c["cost"])
+		if cur == id:
+			var b := UI.button("SELECTED", _noop, 260.0)
+			b.disabled = true
+			cv.add_child(b)
+		elif cost <= 0 or Save.data.get("fish_unlocked", []).has(id):
+			cv.add_child(UI.button("PLAY AS THIS", _select_fish.bind(id), 260.0))
+		else:
+			var b := UI.button("UNLOCK  (%d)" % cost, _unlock_fish.bind(id, cost), 260.0)
+			b.disabled = Save.coins() < cost
+			cv.add_child(b)
+		grid.add_child(card)
 
 
 # ---------------------------------------------------------------- shop
@@ -390,7 +468,24 @@ func _reset_pressed(btn: Button) -> void:
 		btn.text = "CLICK AGAIN TO CONFIRM RESET"
 
 
+func _select_fish(id: String) -> void:
+	Save.data["selected_fish"] = id
+	Save.save_game()
+	_goto("sharks")
+
+
+func _unlock_fish(id: String, cost: int) -> void:
+	if Save.spend(cost):
+		var list: Array = Save.data.get("fish_unlocked", [])
+		list.append(id)
+		Save.data["fish_unlocked"] = list
+		Save.data["selected_fish"] = id
+		Save.save_game()
+	_goto("sharks")
+
+
 func _select_shark(id: String) -> void:
+	Save.data["selected_fish"] = ""
 	Save.data["selected_shark"] = id
 	Save.save_game()
 	_goto("sharks")
@@ -399,6 +494,7 @@ func _select_shark(id: String) -> void:
 func _unlock_shark(id: String, cost: int) -> void:
 	if Save.spend(cost):
 		Save.unlock_shark(id)
+		Save.data["selected_fish"] = ""
 		Save.data["selected_shark"] = id
 		Save.save_game()
 	_goto("sharks")
