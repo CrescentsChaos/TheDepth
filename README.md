@@ -82,3 +82,14 @@ Creature visuals are procedural vector shapes (`shape`: fish, shark, whale, eel,
 - **Play as any fish**: main menu -> CHOOSE FISH -> "ANY FISH / CREATURE" tab. Your diet decides how
   you eat (plankton, algae, carrion or smaller fish). F3 toggles an AI debug overlay.
 - Fields and tuning: see the "Life routine & ecosystem" and "Playing as any creature" sections in `data/DATABASE.md`.
+
+## Camera & sizes
+
+- The camera zooms so **your character is always about the same size on screen** (`PLAYER_SCREEN_LEN`
+  = 72 px at 1280x720 in `scripts/game/game.gd`), whatever species or level. Everything else keeps its
+  true size relative to you, so a blue whale is ~7x a starter shark and a sardine is a speck.
+  Giants are limited by `MIN_ZOOM` (0.27) so the view never becomes the whole ocean; tiny fish by `MAX_ZOOM`.
+- Spawn/despawn distance, plankton, particles, texts, hp bars and the light circle all scale with the
+  zoom, so every species sees a lively ocean with UI of constant size. Swim speed grows with body size.
+- Large sprites (frames wider than 256 px, or `sprite_smooth: true`) get mipmaps + smooth filtering at
+  load time, so big art that is shown small no longer shimmers or looks jagged. Small pixel-art stays crisp.

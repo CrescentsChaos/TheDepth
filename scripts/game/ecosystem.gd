@@ -225,7 +225,7 @@ func _maintain() -> void:
 	var around: Vector2 = game.shark.global_position
 	var i := foods.size() - 1
 	while i >= 0:
-		if foods[i].pos.distance_to(around) > 2400.0 and foods[i].kind != "carrion":
+		if foods[i].pos.distance_to(around) > 2400.0 * game.view_k() and foods[i].kind != "carrion":
 			foods.remove_at(i)
 		i -= 1
 	for k in 2:
@@ -245,11 +245,12 @@ func _populate_initial() -> void:
 
 
 func _spawn_plankton(around: Vector2) -> void:
-	var y := clampf(around.y + randf_range(-800.0, 800.0), 90.0, 2400.0)
+	var k: float = game.view_k()
+	var y := clampf(around.y + randf_range(-800.0, 800.0) * k, 90.0, 2400.0)
 	# thinner with depth
 	if randf() < y / 3600.0:
 		return
-	var x := clampf(around.x + randf_range(-1700.0, 1700.0), 80.0, game.world_w - 80.0)
+	var x := clampf(around.x + randf_range(-1700.0, 1700.0) * k, 80.0, game.world_w - 80.0)
 	if game.is_solid(Vector2(x, y), 20.0):
 		return
 	var f := Food.new()
@@ -258,16 +259,17 @@ func _spawn_plankton(around: Vector2) -> void:
 	f.base_y = y
 	f.max_amount = randf_range(8.0, 14.0)
 	f.amount = f.max_amount
-	f.radius = randf_range(40.0, 65.0)
+	f.radius = randf_range(40.0, 65.0) * clampf(k, 0.5, 3.0)
 	f.seed = randf() * TAU
 	foods.append(f)
 
 
 func _spawn_detritus(around: Vector2) -> void:
-	var y := clampf(around.y + randf_range(-900.0, 900.0), 800.0, game.world_h - 120.0)
+	var k: float = game.view_k()
+	var y := clampf(around.y + randf_range(-900.0, 900.0) * k, 800.0, game.world_h - 120.0)
 	if y < 800.0:
 		return
-	var x := clampf(around.x + randf_range(-1700.0, 1700.0), 80.0, game.world_w - 80.0)
+	var x := clampf(around.x + randf_range(-1700.0, 1700.0) * k, 80.0, game.world_w - 80.0)
 	if game.is_solid(Vector2(x, y), 14.0):
 		return
 	var f := Food.new()
@@ -275,7 +277,7 @@ func _spawn_detritus(around: Vector2) -> void:
 	f.pos = Vector2(x, y)
 	f.max_amount = randf_range(5.0, 9.0)
 	f.amount = f.max_amount
-	f.radius = 26.0
+	f.radius = 26.0 * clampf(k, 0.5, 3.0)
 	f.seed = randf() * TAU
 	foods.append(f)
 
@@ -285,19 +287,21 @@ func _draw() -> void:
 	if game == null or game.shark == null:
 		return
 	var sp: Vector2 = game.shark.global_position
+	var k: float = game.view_k()
+	var u := clampf(game.ui_k(), 0.6, 4.0)       # dots keep a constant size on screen
 	for f: Food in foods:
-		if f.pos.distance_squared_to(sp) > 1500.0 * 1500.0:
+		if f.pos.distance_squared_to(sp) > pow(1500.0 * k, 2.0):
 			continue
-		_draw_food(f)
+		_draw_food(f, u)
 	# algae: a little green shimmer on tiles that still have food
 	for f: Food in algae:
-		if f.amount >= 1.0 and f.pos.distance_squared_to(sp) < 1100.0 * 1100.0:
-			var k := f.amount / f.max_amount
+		if f.amount >= 1.0 and f.pos.distance_squared_to(sp) < pow(1100.0 * k, 2.0):
+			var fill := f.amount / f.max_amount
 			var s := 0.5 + 0.5 * sin(_t * 1.5 + f.seed)
-			draw_circle(f.pos + Vector2(0.0, -10.0), 2.0 + 2.0 * k, Color(0.55, 1.0, 0.55, 0.22 + 0.2 * s * k))
+			draw_circle(f.pos + Vector2(0.0, -10.0 * u), (2.0 + 2.0 * fill) * u, Color(0.55, 1.0, 0.55, 0.22 + 0.2 * s * fill))
 
 
-func _draw_food(f: Food) -> void:
+func _draw_food(f: Food, u: float) -> void:
 	var k := clampf(f.amount / f.max_amount, 0.15, 1.0)
 	match f.kind:
 		"plankton":
@@ -307,11 +311,11 @@ func _draw_food(f: Food) -> void:
 				var a := f.seed + float(i) * 2.399 + _t * (0.25 + 0.05 * float(i % 4))
 				var r := f.radius * (0.25 + 0.75 * fposmod(float(i) * 0.618, 1.0)) * (0.7 + 0.3 * k)
 				var p := f.pos + Vector2(cos(a) * r, sin(a * 1.3) * r * 0.7)
-				draw_circle(p, 1.6 + float(i % 3) * 0.5, Color(0.85, 1.0, 0.9, 0.55))
+				draw_circle(p, (1.6 + float(i % 3) * 0.5) * u, Color(0.85, 1.0, 0.9, 0.55))
 		"detritus":
 			for i in 5:
 				var a2 := f.seed + float(i) * 1.7
-				draw_circle(f.pos + Vector2(cos(a2) * 14.0, sin(a2 * 1.4 + _t * 0.4) * 10.0), 1.8, Color(0.9, 0.92, 1.0, 0.5))
+				draw_circle(f.pos + Vector2(cos(a2) * 14.0, sin(a2 * 1.4 + _t * 0.4) * 10.0) * u, 1.8 * u, Color(0.9, 0.92, 1.0, 0.5))
 		"carrion":
 			var s := clampf(f.radius * 0.4, 6.0, 26.0) * (0.6 + 0.4 * k)
 			draw_colored_polygon(PackedVector2Array([f.pos + Vector2(-s, 0.0), f.pos + Vector2(-s * 0.2, -s * 0.5), f.pos + Vector2(s, -s * 0.1), f.pos + Vector2(s * 0.3, s * 0.5)]), Color(0.78, 0.3, 0.3, 0.9))

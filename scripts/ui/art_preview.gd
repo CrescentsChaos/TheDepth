@@ -13,8 +13,8 @@ var _t := 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if sprites != null and sprites.smooth:
-		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	if sprites != null:
+		sprites.apply_filter(self)
 
 
 func _process(delta: float) -> void:

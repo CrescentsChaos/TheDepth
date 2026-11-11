@@ -4,7 +4,11 @@ extends Node2D
 
 const TILE := 32
 const TARGET_CREATURES := 65
-const DESPAWN_DIST := 2300.0
+## The camera zooms so the player's body is always about this long on screen (at 1280x720),
+## whatever species or level. Everything else keeps its true size relative to the player.
+const PLAYER_SCREEN_LEN := 72.0
+const MIN_ZOOM := 0.27
+const MAX_ZOOM := 4.0
 
 const DARK_SHADER := """
 shader_type canvas_item;
@@ -102,6 +106,7 @@ func _ready() -> void:
 	camera.limit_top = -800
 	camera.limit_bottom = int(world_h)
 	camera.position = shark.position
+	camera.zoom = Vector2(target_zoom(), target_zoom())
 	add_child(camera)
 	camera.make_current()
 
@@ -157,13 +162,27 @@ func _physics_process(delta: float) -> void:
 	_update_biome()
 
 
+func target_zoom() -> float:
+	return clampf(PLAYER_SCREEN_LEN / maxf(shark.length, 4.0), MIN_ZOOM, MAX_ZOOM)
+
+
+## How much of the world the screen covers compared with the starter shark (1.0). Spawning, despawning,
+## plankton and effects scale with it so a tiny sardine and a blue whale both see a lively ocean.
+func view_k() -> float:
+	return clampf(0.972 / target_zoom(), 0.35, 6.5)
+
+
+## World pixels per screen pixel: sizes of UI-like things (texts, hp bars, particles) use this
+## so they look the same on screen whatever the zoom.
+func ui_k() -> float:
+	return 1.0 / maxf(camera.zoom.x, 0.05)
+
+
 func _update_camera(delta: float) -> void:
 	var target := shark.global_position + shark.velocity * 0.3
 	camera.position = camera.position.lerp(target, 1.0 - exp(-6.0 * delta))
-	var z := shark.cam_base / (1.0 + 0.035 * float(shark.level - 1))
-	if shark.boosting:
-		z *= 0.92
-	camera.zoom = camera.zoom.lerp(Vector2(z, z), 1.0 - exp(-2.0 * delta))
+	var z := target_zoom()
+	camera.zoom = camera.zoom.lerp(Vector2(z, z), 1.0 - exp(-3.0 * delta))
 	if shake_amt > 0.1 and bool(Save.setting("screen_shake")):
 		camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake_amt
 	else:
@@ -179,7 +198,8 @@ func _update_darkness(delta: float) -> void:
 	var vp := get_viewport_rect().size
 	var screen := get_viewport().get_canvas_transform() * shark.global_position
 	var light := 1.0 + Database.upgrade_bonus("light") + float(shark.def.get("innate_light", 0.0))
-	var world_r := 360.0 * light * (1.0 + 0.04 * float(shark.level - 1))
+	# the lit area has a constant size on screen, like the player
+	var world_r := 360.0 * light * (1.0 + 0.01 * float(shark.level - 1)) * ui_k()
 	dark_mat.set_shader_parameter("center", screen / vp)
 	dark_mat.set_shader_parameter("aspect", vp.x / vp.y)
 	dark_mat.set_shader_parameter("radius", world_r * camera.zoom.x / vp.y)
@@ -236,7 +256,7 @@ func _spawn_tick() -> void:
 		var cr := node as Creature
 		if cr == null or cr.dead:
 			continue
-		if cr.global_position.distance_to(shark.global_position) > DESPAWN_DIST:
+		if cr.global_position.distance_to(shark.global_position) > clampf(2300.0 * view_k(), 800.0, 7500.0):
 			cr.remove()
 			continue
 		total += 1
@@ -280,9 +300,10 @@ func _pick_def(y: float, surface_roll: bool) -> Dictionary:
 
 
 func _spawn_position(d: Dictionary, around: Vector2, offscreen: bool) -> Vector2:
-	var dx := randf_range(-1400.0, 1400.0)
+	var k := view_k()
+	var dx := randf_range(-1400.0, 1400.0) * k
 	if offscreen:
-		dx = randf_range(550.0, 1100.0) * (1.0 if randf() < 0.5 else -1.0)
+		dx = randf_range(550.0, 1100.0) * k * (1.0 if randf() < 0.5 else -1.0)
 	var x := clampf(around.x + dx, 60.0, world_w - 60.0)
 	match str(d["behavior"]):
 		"fly":
@@ -291,7 +312,7 @@ func _spawn_position(d: Dictionary, around: Vector2, offscreen: bool) -> Vector2
 			return Vector2(x, -float(d["length"]) * 0.12)
 		"bottom", "static":
 			return Vector2(x, world.floor_y_at(x) - float(d["length"]) * 0.3)
-	var y := clampf(around.y + randf_range(-700.0, 700.0), maxf(float(d["min_depth"]), 50.0), minf(float(d["max_depth"]), world_h - 120.0))
+	var y := clampf(around.y + randf_range(-700.0, 700.0) * k, maxf(float(d["min_depth"]), 50.0), minf(float(d["max_depth"]), world_h - 120.0))
 	return Vector2(x, y)
 
 
@@ -299,15 +320,16 @@ func _spawn_position(d: Dictionary, around: Vector2, offscreen: bool) -> Vector2
 func _spawn_random(offscreen: bool) -> int:
 	var around := shark.global_position
 	var surface_roll := randf() < 0.10 and around.y < 900.0
-	var y_ref := clampf(around.y + randf_range(-700.0, 700.0), 50.0, world_h - 120.0)
+	var k := view_k()
+	var y_ref := clampf(around.y + randf_range(-700.0, 700.0) * k, 50.0, world_h - 120.0)
 	var d := _pick_def(y_ref, surface_roll)
 	if d.is_empty():
 		return 0
 	var pos := _spawn_position(d, around, offscreen)
 	if _is_floor_type(d):
-		if pos.y < float(d["min_depth"]) or pos.y > float(d["max_depth"]) or absf(pos.y - around.y) > 1000.0:
+		if pos.y < float(d["min_depth"]) or pos.y > float(d["max_depth"]) or absf(pos.y - around.y) > 1000.0 * k:
 			return 0
-	if pos.distance_to(around) < (400.0 if not offscreen else 0.0):
+	if pos.distance_to(around) < (400.0 * k if not offscreen else 0.0):
 		return 0
 	if is_solid(pos, 12.0):
 		return 0
@@ -446,17 +468,18 @@ func splash(pos: Vector2) -> void:
 
 
 func floating_text(pos: Vector2, text: String, col: Color = Color.WHITE, font_size: int = 22) -> void:
+	var u := ui_k()
 	var l := Label.new()
 	l.text = text
 	l.modulate = col
-	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_font_size_override("font_size", int(font_size * u))
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 5)
-	l.position = pos - Vector2(30, 20)
+	l.add_theme_constant_override("outline_size", int(5.0 * u))
+	l.position = pos - Vector2(30, 20) * u
 	l.z_index = 30
 	fx_root.add_child(l)
 	var tw := create_tween()
-	tw.tween_property(l, "position:y", l.position.y - 70.0, 0.9)
+	tw.tween_property(l, "position:y", l.position.y - 70.0 * u, 0.9)
 	tw.parallel().tween_property(l, "modulate:a", 0.0, 0.9)
 	tw.tween_callback(l.queue_free)
 
@@ -471,11 +494,12 @@ func burst(pos: Vector2, col: Color, amount: int) -> void:
 	p.texture = CreatureArt.soft_dot()
 	p.direction = Vector2.UP
 	p.spread = 180.0
-	p.initial_velocity_min = 60.0
-	p.initial_velocity_max = 220.0
-	p.scale_amount_min = 0.3
-	p.scale_amount_max = 0.7
-	p.gravity = Vector2(0, 40)
+	var u := ui_k()
+	p.initial_velocity_min = 60.0 * u
+	p.initial_velocity_max = 220.0 * u
+	p.scale_amount_min = 0.3 * u
+	p.scale_amount_max = 0.7 * u
+	p.gravity = Vector2(0, 40) * u
 	p.color = col
 	fx_root.add_child(p)
 	p.emitting = true
@@ -484,28 +508,29 @@ func burst(pos: Vector2, col: Color, amount: int) -> void:
 
 func draw_overlay(c: Node2D) -> void:
 	var font := ThemeDB.fallback_font
+	var u := ui_k()
 	var sp := shark.global_position
 	for node in creatures_root.get_children():
 		var cr := node as Creature
 		if cr == null or cr.dead:
 			continue
-		var top := cr.position + Vector2(0.0, -cr.length * 0.45 - 12.0)
-		if cr.sleeping and sp.distance_to(cr.position) < 900.0:
+		var top := cr.position + Vector2(0.0, -cr.length * 0.45 - 12.0 * u)
+		if cr.sleeping and sp.distance_to(cr.position) < 900.0 * view_k():
 			var bob := sin(run_time * 2.0 + cr.phase) * 3.0
-			c.draw_string(font, top + Vector2(6.0, -2.0 + bob), "z", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.85, 0.95, 1.0, 0.8))
-			c.draw_string(font, top + Vector2(16.0, -12.0 - bob), "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(0.85, 0.95, 1.0, 0.9))
-		if debug_ai and sp.distance_to(cr.position) < 1100.0:
+			c.draw_string(font, top + Vector2(6.0, -2.0 + bob) * u, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, int(14.0 * u), Color(0.85, 0.95, 1.0, 0.8))
+			c.draw_string(font, top + Vector2(16.0, -12.0 - bob) * u, "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, int(18.0 * u), Color(0.85, 0.95, 1.0, 0.9))
+		if debug_ai and sp.distance_to(cr.position) < 1100.0 * view_k():
 			var tag := "%s%s  hun %d%%  en %d%%" % [cr.mode, " (zz)" if cr.sleeping else "", int(cr.hunger * 100.0), int(cr.energy * 100.0)]
-			c.draw_string(font, cr.position + Vector2(-50.0, cr.length * 0.45 + 26.0), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1.0, 1.0, 0.6))
+			c.draw_string(font, cr.position + Vector2(-50.0 * u, cr.length * 0.45 + 26.0 * u), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, int(13.0 * u), Color(1.0, 1.0, 0.6))
 			if cr.target != null and is_instance_valid(cr.target):
 				c.draw_line(cr.position, cr.target.position, Color(1.0, 0.3, 0.3, 0.7), 2.0)
 			elif cr.target_food != null and cr.mode in ["forage", "graze"]:
 				c.draw_line(cr.position, cr.target_food.pos, Color(0.4, 1.0, 0.5, 0.7), 2.0)
 		if cr.hp < cr.max_hp and cr.max_hp > 1.5:
-			var w := maxf(cr.length * 0.5, 30.0)
-			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w, 5.0), Color(0, 0, 0, 0.6))
-			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w * cr.hp / cr.max_hp, 5.0), Color("#ff5a4a"))
-		if shark.alive and cr.attack_damage_vs(shark) > 0.0 and cr.stun <= 0.0 and sp.distance_to(cr.position) < 650.0:
-			var p := top + Vector2(0.0, -20.0)
-			c.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -13), p + Vector2(13, 11), p + Vector2(-13, 11)]), Color("#ff4a3a"))
-			c.draw_string(font, p + Vector2(-4, 9), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color.WHITE)
+			var w := maxf(cr.length * 0.5, 30.0 * u)
+			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w, 5.0 * u), Color(0, 0, 0, 0.6))
+			c.draw_rect(Rect2(top.x - w * 0.5, top.y, w * cr.hp / cr.max_hp, 5.0 * u), Color("#ff5a4a"))
+		if shark.alive and cr.attack_damage_vs(shark) > 0.0 and cr.stun <= 0.0 and sp.distance_to(cr.position) < 650.0 * view_k():
+			var p := top + Vector2(0.0, -20.0 * u)
+			c.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -13) * u, p + Vector2(13, 11) * u, p + Vector2(-13, 11) * u]), Color("#ff4a3a"))
+			c.draw_string(font, p + Vector2(-4, 9) * u, "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(16.0 * u), Color.WHITE)

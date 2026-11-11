@@ -119,8 +119,8 @@ func setup(p_def: Dictionary, p_game: Node) -> void:
 	home_y = position.y
 	sprites = SpriteSet.for_def("creatures", def)
 	wiggle = not upright and behavior != "static"
-	if sprites != null and sprites.smooth:
-		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	if sprites != null:
+		sprites.apply_filter(self)
 	# life profile
 	diet = str(def["diet"])
 	activity = str(def["activity"])

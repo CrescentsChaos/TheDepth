@@ -57,7 +57,6 @@ var eats: Array = []
 var shape_name := "shark"
 var upright := false
 var heading := 1.0
-var cam_base := 1.0           # camera zoom factor for very small / very large species
 var ram_dmg := 0.0            # passive body traits: touching creatures hurts them
 var thorn_dmg := 0.0
 var ram_stun := 0.0
@@ -83,11 +82,9 @@ func setup(p_def: Dictionary) -> void:
 	thorn_dmg = float(def.get("thorns", 0.0))
 	ram_stun = float(def.get("stun", 0.0))
 	var kind := str(def.get("_kind", "sharks"))
-	if kind == "creatures":
-		cam_base = clampf(pow(70.0 / maxf(float(def["length"]), 8.0), 0.35), 0.5, 1.5)
 	_sprites = SpriteSet.for_def(kind, def)
-	if _sprites != null and _sprites.smooth:
-		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	if _sprites != null:
+		_sprites.apply_filter(self)
 	recalc(true)
 
 
@@ -97,8 +94,13 @@ func recalc(fill: bool = false) -> void:
 	max_health = float(def["max_health"]) * (1.0 + 0.10 * lv) * (1.0 + Database.upgrade_bonus("max_health"))
 	max_hunger = float(def["max_hunger"]) * (1.0 + Database.upgrade_bonus("max_hunger"))
 	max_stamina = float(def["stamina"]) * (1.0 + Database.upgrade_bonus("stamina"))
-	max_speed = float(def["speed"]) * (1.0 + 0.02 * lv) * (1.0 + Database.upgrade_bonus("speed"))
-	accel = float(def["accel"])
+	# The camera keeps the player the same size on screen, so a bigger body must also swim faster in
+	# world units, or growing would feel like slowing down. 70 px is the reference (starter shark).
+	var size_k := pow(length / 70.0, 0.55)
+	if length > 300.0:
+		size_k *= pow(length / 300.0, 0.5)            # giants: a blue whale should still cross the map
+	max_speed = float(def["speed"]) * size_k * (1.0 + Database.upgrade_bonus("speed"))
+	accel = float(def["accel"]) * size_k
 	boost_mult = float(def["boost_mult"])
 	bite_dmg = float(def["bite_damage"]) * (1.0 + 0.12 * lv) * (1.0 + Database.upgrade_bonus("bite_damage"))
 	bite_reach = float(def["bite_range"]) * (length / float(def["length"]))
@@ -267,6 +269,12 @@ func _move(delta: float, dir_in: Vector2) -> void:
 		rotation = facing_angle
 		scale = Vector2(1.0, -1.0 if absf(wrapf(facing_angle, -PI, PI)) > PI * 0.5 else 1.0)
 	_bubbles.emitting = (not in_air) and velocity.length() > 80.0
+	var ub: float = game.ui_k()
+	_bubbles.scale_amount_min = 0.15 * ub
+	_bubbles.scale_amount_max = 0.4 * ub
+	_bubbles.initial_velocity_min = 8.0 * ub
+	_bubbles.initial_velocity_max = 28.0 * ub
+	_bubbles.gravity = Vector2(0, -50) * ub
 
 
 func _check(cause: String) -> void:

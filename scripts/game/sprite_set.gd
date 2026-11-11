@@ -40,6 +40,9 @@ var faces_left := false
 var smooth := false
 var autosize := true
 var wiggle_amount := 0.0
+## Texture filter the owning node should use (see apply_filter). Big hand-drawn art gets mipmaps so it
+## stays smooth when shrunk to a few dozen pixels; small pixel art stays crisp.
+var filter_mode := CanvasItem.TEXTURE_FILTER_NEAREST
 ## Visible area of the art as a 0..1 rectangle of one frame (union of all frames/animations).
 var content := Rect2(0.0, 0.0, 1.0, 1.0)
 
@@ -79,6 +82,33 @@ func _read(kind: String, def: Dictionary) -> void:
 	if legacy != "" and ResourceLoader.exists(legacy):
 		_add("swim", load(legacy) as Texture2D, maxi(1, int(def.get("sprite_frames", 1))))
 	content = _measure() if autosize else Rect2(0.0, 0.0, 1.0, 1.0)
+	_prepare_textures()
+
+
+## Big textures are shown much smaller than they are. Without mipmaps that aliases (shimmering,
+## jagged, "distorted" art), so build them at load time. Pixel art (small frames) is left alone.
+func _prepare_textures() -> void:
+	var hires := false
+	for k in anims.keys():
+		var a: Dictionary = anims[k]
+		var tex: Texture2D = a["tex"]
+		var fw := float(tex.get_width()) / float(int(a["frames"]))
+		if fw <= 256.0 and not smooth:
+			continue
+		hires = true
+		var img := tex.get_image()
+		if img == null:
+			continue
+		if img.is_compressed():
+			img.decompress()
+		img.generate_mipmaps()
+		a["tex"] = ImageTexture.create_from_image(img)
+	if smooth or hires:
+		filter_mode = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+
+
+func apply_filter(node: CanvasItem) -> void:
+	node.texture_filter = filter_mode
 
 
 ## Union of the visible pixels over every frame of every animation, as 0..1 of one frame.
@@ -186,7 +216,8 @@ func draw(c: CanvasItem, L: float, t: float, anim: String = "swim", loop: bool =
 		var tmp := u0
 		u0 = u1
 		u1 = tmp
-	var slices := WIGGLE_SLICES if (wiggle and n == 1 and wiggle_amount > 0.0) else 1
+	# more slices for bigger art so the tail wave stays smooth instead of stair-stepped
+	var slices := clampi(int(L / 14.0), WIGGLE_SLICES, 40) if (wiggle and n == 1 and wiggle_amount > 0.0) else 1
 	var cols := PackedColorArray([tint, tint, tint, tint])
 	for s in slices:
 		var k0 := float(s) / float(slices)
