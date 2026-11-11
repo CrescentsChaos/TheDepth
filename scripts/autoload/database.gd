@@ -10,7 +10,7 @@ const TABLES := ["creatures", "sharks", "biomes", "upgrades"]
 const CREATURE_DEFAULTS := {
 	"name": "Unknown", "description": "", "length": 24.0, "shape": "fish",
 	"color": "#88aacc", "accent": "#ffffff",
-	"min_depth": 0, "max_depth": 3200, "weight": 10.0, "max_count": 10, "school_size": 1,
+	"min_depth": 0, "max_depth": 12000, "weight": 10.0, "habitats": [], "max_count": 10, "school_size": 1,
 	"behavior": "wander", "speed": 70.0, "hp": 1.0,
 	"xp": 5, "hunger": 6, "coins": 1, "score": 10,
 	"contact_damage": 0.0, "thorns": 0.0, "poison": 0.0, "stun": 0.0,
@@ -176,9 +176,10 @@ func creature_as_player(c: Dictionary) -> Dictionary:
 		"contact_damage": float(c["contact_damage"]), "thorns": float(c["thorns"]),
 		"stun": float(c["stun"]), "poison": float(c["poison"]),
 		# species that live in the deep are built for it
-		"innate_pressure_resist": 0.92 if float(c["min_depth"]) >= 1000.0 else (0.5 if float(c["min_depth"]) >= 500.0 else 0.0),
-		"innate_light": 0.6 if float(c["min_depth"]) >= 1000.0 else (0.25 if float(c["min_depth"]) >= 500.0 else 0.0),
-		"start_depth": clampf(float(c["min_depth"]) + 200.0, 260.0, 2800.0),
+		"innate_pressure_resist": 0.92 if float(c["min_depth"]) >= 2600.0 else (0.5 if float(c["min_depth"]) >= 900.0 else 0.0),
+		"innate_light": 0.6 if float(c["min_depth"]) >= 2600.0 else (0.25 if float(c["min_depth"]) >= 900.0 else 0.0),
+		"start_depth": clampf(float(c["min_depth"]) + 200.0, 260.0, 11000.0),
+		"start_region": str(c["habitats"][0]) if not (c["habitats"] as Array).is_empty() else "reef",
 		"sprite": str(c["sprite"]), "sprite_frames": c["sprite_frames"], "sprite_fps": c["sprite_fps"],
 		"sprite_scale": c["sprite_scale"], "sprite_faces_left": c["sprite_faces_left"],
 		"sprite_smooth": c["sprite_smooth"], "sprite_autosize": c["sprite_autosize"], "sprite_wiggle": c["sprite_wiggle"],

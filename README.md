@@ -93,3 +93,24 @@ Creature visuals are procedural vector shapes (`shape`: fish, shark, whale, eel,
   zoom, so every species sees a lively ocean with UI of constant size. Swim speed grows with body size.
 - Large sprites (frames wider than 256 px, or `sprite_smooth: true`) get mipmaps + smooth filtering at
   load time, so big art that is shown small no longer shimmers or looks jagged. Small pixel-art stays crisp.
+
+
+## New: big world with six regions
+
+The map is now 800 x 380 tiles (25,600 x 12,160 px, ~1.2 km deep) instead of 300 x 100:
+
+| Region | What is there |
+|---|---|
+| **Sunny Coast** | beach island with palms, lighthouse and pier, sandy shallows, seagrass, shells, tide-pool life |
+| **Kelp Forest** | tall swaying kelp up to the surface canopy, rocky outcrops, sea stacks |
+| **Coral Reef** | a dozen coral types, bommies and arches you can swim through, sandy cays, caves in the reef wall |
+| **Open Ocean** | the reef wall drops to an abyssal plain, seamounts, hydrothermal vents with tube worms, a hadal trench (down to ~1190 m) |
+| **River Mouth & River** | murky water with a **current** that pushes you to the sea, sandbars, reeds, lily pads, logs, a bridge |
+| **Mangrove Swamp** | dark murky water (short sight range), mangrove islets with prop roots, scum, methane bubbles, alligators |
+
+- Depth zones: Sunlit 0-90 m, Twilight to 260 m, Midnight to 500 m, Abyss to 820 m, **Hadal Trench** below.
+- ~50 new creatures; each species has `habitats` (regions) and a depth range. See `data/DATABASE.md`.
+- The HUD shows the region + zone and a **minimap** (Settings: "Show minimap").
+- **Characters are bigger on screen**: the camera keeps you ~170 px long (was 72). Change it in Settings -> *Character size*.
+- `tools/make_tiles.py` regenerates `assets/tiles/world_tileset.png` and the `.tres` (81 tiles; run `python3 tools/make_tiles.py assets/tiles`). New species have no sprites yet, so they use the vector art until you add `assets/sprites/creatures/<id>/swim.png`.
+- Not tested in the Godot editor here: if anything looks off, check the Output panel and tell me what it says.

@@ -19,6 +19,8 @@ const DEFAULTS := {
 		"mouse_steer": true,
 		"screen_shake": true,
 		"show_hints": true,
+		"char_size": 1.0,   # camera zoom: how big the player's creature is on screen
+		"minimap": true,
 	},
 }
 

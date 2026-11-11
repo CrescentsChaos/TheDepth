@@ -267,6 +267,8 @@ func _physics_process(delta: float) -> void:
 	var accel := base_speed * 3.0 / maxf(1.0, length / 120.0)
 	velocity = velocity.move_toward(desired, accel * delta)
 	position += velocity * delta
+	if behavior != "bottom" and behavior != "static" and behavior != "fly" and behavior != "surface":
+		position += game.world.current_at(position) * delta   # rivers carry things toward the sea
 	_tick_needs(delta)
 	_check_strike()
 	_constrain(delta)
@@ -365,19 +367,9 @@ func _find_home() -> Vector2:
 	var lo := maxf(float(def["min_depth"]), 40.0)
 	var hi := minf(float(def["max_depth"]), game.world_h - 80.0)
 	if rest_style != "open":
-		var best := Vector2.ZERO
-		var best_d := 1400.0 * 1400.0
-		var found := false
-		for f in game.eco.algae:
-			if f.pos.y < lo or f.pos.y > hi:
-				continue
-			var d := position.distance_squared_to(f.pos)
-			if d < best_d:
-				best_d = d
-				best = f.pos
-				found = true
-		if found:
-			return best + Vector2(randf_range(-20.0, 20.0), -length * (0.3 if rest_style == "reef" else 0.15))
+		var plant: Ecosystem.Food = game.eco.nearest_algae(position, 1400.0, lo, hi)
+		if plant != null:
+			return plant.pos + Vector2(randf_range(-20.0, 20.0), -length * (0.3 if rest_style == "reef" else 0.15))
 		if rest_style == "floor":
 			return Vector2(position.x, hi - length * 0.2)
 	return position

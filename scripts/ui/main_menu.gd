@@ -276,7 +276,7 @@ func _fish_tab(outer: VBoxContainer) -> void:
 		var diet := UI.label(Database.diet_text(p), 15, UI.C_GOLD)
 		diet.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		cv.add_child(diet)
-		cv.add_child(UI.label("Size %d   Speed %d   Health %d\nBite %.1f   Lives at %d-%d m" % [int(c["length"]), int(p["speed"]), int(p["max_health"]), float(p["bite_damage"]), int(float(c["min_depth"]) / 10.0), int(float(c["max_depth"]) / 10.0)], 15))
+		cv.add_child(UI.label("Size %d   Speed %d   Health %d\nBite %.1f   Lives: %s" % [int(c["length"]), int(p["speed"]), int(p["max_health"]), float(p["bite_damage"]), _habitat_text(c)], 15))
 		var cost := int(c["cost"])
 		if cur == id:
 			var b := UI.button("SELECTED", _noop, 260.0)
@@ -386,10 +386,23 @@ func _creature_text(d: Dictionary) -> String:
 		danger += "  Poisonous."
 	if float(d["stun"]) > 0.0:
 		danger += "  Shocks."
-	return "%s - %s\nLength %d   HP %d   Behavior: %s   Depth %d-%d m\nXP %d   Hunger +%d   Coins %d   Score %d.%s" % [
+	return "%s - %s\nLength %d   HP %d   Behavior: %s   Lives: %s\nXP %d   Hunger +%d   Coins %d   Score %d.%s" % [
 		str(d["name"]), str(d["description"]), int(d["length"]), int(d["hp"]), str(d["behavior"]),
-		int(float(d["min_depth"]) / 10.0), int(minf(float(d["max_depth"]), 3200.0) / 10.0),
+		_habitat_text(d),
 		int(d["xp"]), int(d["hunger"]), int(d["coins"]), int(d["score"]), danger]
+
+
+## "Coral Reef, Kelp Forest  60-120 m" (birds and boats: "above the waves").
+func _habitat_text(d: Dictionary) -> String:
+	var b := str(d["behavior"])
+	if b == "fly" or b == "surface":
+		return "above the waves"
+	var names: Array = []
+	for r in WorldGenerator.REGIONS:
+		if (d["habitats"] as Array).has(str(r["id"])):
+			names.append(str(r["name"]))
+	var where := ", ".join(names) if not names.is_empty() else "anywhere"
+	return "%s  %d-%d m" % [where, int(float(d["min_depth"]) / 10.0), int(minf(float(d["max_depth"]), 11900.0) / 10.0)]
 
 
 # ---------------------------------------------------------------- settings
@@ -414,7 +427,20 @@ func _page_settings() -> void:
 	vol_row.add_child(slider)
 	v.add_child(vol_row)
 
+	var size_row := HBoxContainer.new()
+	size_row.add_child(UI.label("Character size   ", 22))
+	var size_slider := HSlider.new()
+	size_slider.min_value = 0.6
+	size_slider.max_value = 1.6
+	size_slider.step = 0.05
+	size_slider.value = float(Save.setting("char_size"))
+	size_slider.custom_minimum_size = Vector2(300, 28)
+	size_slider.value_changed.connect(_on_char_size)
+	size_row.add_child(size_slider)
+	v.add_child(size_row)
+
 	v.add_child(_check("Fullscreen", "fullscreen"))
+	v.add_child(_check("Show minimap", "minimap"))
 	v.add_child(_check("Mouse steering (swim toward the cursor)", "mouse_steer"))
 	v.add_child(_check("Screen shake", "screen_shake"))
 	v.add_child(_check("Show hints at start of a run", "show_hints"))
@@ -443,6 +469,10 @@ func _check(text: String, key: String) -> CheckButton:
 func _on_check(on: bool, key: String) -> void:
 	Save.set_setting(key, on)
 	Boot.apply_settings()
+
+
+func _on_char_size(val: float) -> void:
+	Save.set_setting("char_size", val)
 
 
 func _on_volume(val: float) -> void:

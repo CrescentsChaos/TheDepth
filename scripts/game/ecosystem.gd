@@ -38,6 +38,8 @@ var game: Node
 var clock := DAY_LENGTH * START_FRACTION
 var foods: Array = []     # drifting / temporary Food
 var algae: Array = []     # permanent Food on decor tiles
+var algae_grid := {}      # Vector2i bucket -> Array of Food (fast lookups on the big map)
+var _regrow_t := 0.0
 var _t := 0.0
 var _tick := 0.0
 
@@ -45,19 +47,55 @@ var _tick := 0.0
 func setup(p_game: Node) -> void:
 	game = p_game
 	z_index = 0
-	var decor := game.world.get_node_or_null("Decor") as TileMapLayer
-	if decor != null:
-		for cell in decor.get_used_cells():
-			var f := Food.new()
-			f.kind = "algae"
-			f.pos = decor.to_global(decor.map_to_local(cell)) + Vector2(0.0, 6.0)
-			f.max_amount = 8.0
-			f.amount = f.max_amount * randf_range(0.4, 1.0)
-			f.regrow = 0.18
-			f.radius = 22.0
-			f.seed = randf() * TAU
-			algae.append(f)
+	for p in game.world.algae_positions():
+		var f := Food.new()
+		f.kind = "algae"
+		f.pos = p + Vector2(0.0, 6.0)
+		f.max_amount = 8.0
+		f.amount = f.max_amount * randf_range(0.4, 1.0)
+		f.regrow = 0.18
+		f.radius = 22.0
+		f.seed = randf() * TAU
+		algae.append(f)
+		var key := _bucket(f.pos)
+		if not algae_grid.has(key):
+			algae_grid[key] = []
+		algae_grid[key].append(f)
 	_populate_initial()
+
+
+const GRID := 256.0
+
+
+func _bucket(p: Vector2) -> Vector2i:
+	return Vector2i(int(floor(p.x / GRID)), int(floor(p.y / GRID)))
+
+
+## Algae plants whose bucket touches the box around `pos` (callers still check distance).
+func _algae_near(pos: Vector2, radius: float) -> Array:
+	var out: Array = []
+	var c0 := _bucket(pos - Vector2(radius, radius))
+	var c1 := _bucket(pos + Vector2(radius, radius))
+	for gx in range(c0.x, c1.x + 1):
+		for gy in range(c0.y, c1.y + 1):
+			var lst: Variant = algae_grid.get(Vector2i(gx, gy))
+			if lst != null:
+				out.append_array(lst)
+	return out
+
+
+## Nearest plant with food inside a depth band (used to find a den).
+func nearest_algae(pos: Vector2, radius: float, ymin: float, ymax: float) -> Food:
+	var best: Food = null
+	var best_d := radius * radius
+	for f: Food in _algae_near(pos, radius):
+		if f.pos.y < ymin or f.pos.y > ymax:
+			continue
+		var d := pos.distance_squared_to(f.pos)
+		if d < best_d:
+			best_d = d
+			best = f
+	return best
 
 
 # ------------------------------------------------------------------ clock
@@ -113,7 +151,10 @@ func kinds_for(diet: String) -> Array:
 func nearest(kinds: Array, pos: Vector2, radius: float) -> Food:
 	var best: Food = null
 	var best_d := radius * radius
-	for list in [foods, algae]:
+	var lists: Array = [foods]
+	if "algae" in kinds:
+		lists.append(_algae_near(pos, radius))
+	for list in lists:
 		for f: Food in list:
 			if f.amount < 1.0 or not (f.kind in kinds):
 				continue
@@ -128,7 +169,10 @@ func nearest(kinds: Array, pos: Vector2, radius: float) -> Food:
 func in_reach(kinds: Array, pos: Vector2, reach: float) -> Food:
 	var best: Food = null
 	var best_d := INF
-	for list in [foods, algae]:
+	var lists: Array = [foods]
+	if "algae" in kinds:
+		lists.append(_algae_near(pos, reach + 60.0))
+	for list in lists:
 		for f: Food in list:
 			if f.amount < 1.0 or not (f.kind in kinds):
 				continue
@@ -178,9 +222,12 @@ func _physics_process(delta: float) -> void:
 	clock += delta
 	_t += delta
 	var night := night_amount()
-	for f: Food in algae:
-		if f.amount < f.max_amount:
-			f.amount = minf(f.amount + f.regrow * delta, f.max_amount)
+	_regrow_t += delta
+	if _regrow_t >= 0.5:
+		for f: Food in algae:
+			if f.amount < f.max_amount:
+				f.amount = minf(f.amount + f.regrow * _regrow_t, f.max_amount)
+		_regrow_t = 0.0
 	var i := foods.size() - 1
 	while i >= 0:
 		var f: Food = foods[i]
@@ -246,9 +293,9 @@ func _populate_initial() -> void:
 
 func _spawn_plankton(around: Vector2) -> void:
 	var k: float = game.view_k()
-	var y := clampf(around.y + randf_range(-800.0, 800.0) * k, 90.0, 2400.0)
+	var y := clampf(around.y + randf_range(-800.0, 800.0) * k, 90.0, 3200.0)
 	# thinner with depth
-	if randf() < y / 3600.0:
+	if randf() < y / 4600.0:
 		return
 	var x := clampf(around.x + randf_range(-1700.0, 1700.0) * k, 80.0, game.world_w - 80.0)
 	if game.is_solid(Vector2(x, y), 20.0):
@@ -294,7 +341,7 @@ func _draw() -> void:
 			continue
 		_draw_food(f, u)
 	# algae: a little green shimmer on tiles that still have food
-	for f: Food in algae:
+	for f: Food in _algae_near(sp, 1100.0 * k):
 		if f.amount >= 1.0 and f.pos.distance_squared_to(sp) < pow(1100.0 * k, 2.0):
 			var fill := f.amount / f.max_amount
 			var s := 0.5 + 0.5 * sin(_t * 1.5 + f.seed)

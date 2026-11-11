@@ -3,12 +3,13 @@ extends Node2D
 ## Main gameplay controller: spawning, interactions, camera, darkness, effects, run end.
 
 const TILE := 32
-const TARGET_CREATURES := 65
+const TARGET_CREATURES := 85
 ## The camera zooms so the player's body is always about this long on screen (at 1280x720),
 ## whatever species or level. Everything else keeps its true size relative to the player.
-const PLAYER_SCREEN_LEN := 72.0
-const MIN_ZOOM := 0.27
-const MAX_ZOOM := 4.0
+## Players can scale it in Settings -> "Character size" (Save setting `char_size`).
+const PLAYER_SCREEN_LEN := 170.0
+const MIN_ZOOM := 0.24
+const MAX_ZOOM := 5.5
 
 const DARK_SHADER := """
 shader_type canvas_item;
@@ -49,18 +50,22 @@ var overlay: Overlay
 var dark_rect: ColorRect
 var dark_mat: ShaderMaterial
 
-var world_w := 9600.0
-var world_h := 3200.0
+var world_w := 25600.0
+var world_h := 12160.0
 var score := 0
 var coins_run := 0
 var eaten_run := 0
 var run_time := 0.0
 var finished := false
 var biome_id := ""
+var biome_name := ""
+var region_id := ""
+var region_name := ""
 var shake_amt := 0.0
 
 var _spawn_cd := 0.0
 var _dark_cur := 0.0
+var _tint_cur := Color(0.0, 0.02, 0.07, 1.0)
 var _counts := {}
 
 
@@ -85,7 +90,11 @@ func _ready() -> void:
 	shark.z_index = 5
 	shark.setup(Database.selected_def())
 	# every species starts at home: deep-sea fish start deep
-	shark.position = _find_free_spot(Vector2(world_w * 0.5, float(shark.def.get("start_depth", 260.0))), shark.length * 0.5 + 24.0)
+	var start_depth := float(shark.def.get("start_depth", 260.0))
+	var start_region := str(shark.def.get("start_region", "reef"))
+	if start_depth > 1800.0:
+		start_region = "ocean"  # only the open ocean is deep enough
+	shark.position = _find_free_spot(Vector2(world.region_center_x(start_region), start_depth), shark.length * 0.5 + 24.0)
 	add_child(shark)
 	if str(shark.def.get("_kind", "sharks")) == "creatures":
 		Save.discover(shark.species_id)
@@ -163,13 +172,17 @@ func _physics_process(delta: float) -> void:
 
 
 func target_zoom() -> float:
-	return clampf(PLAYER_SCREEN_LEN / maxf(shark.length, 4.0), MIN_ZOOM, MAX_ZOOM)
+	return clampf(player_screen_len() / maxf(shark.length, 4.0), MIN_ZOOM, MAX_ZOOM)
+
+
+func player_screen_len() -> float:
+	return PLAYER_SCREEN_LEN * clampf(float(Save.setting("char_size")), 0.5, 1.8)
 
 
 ## How much of the world the screen covers compared with the starter shark (1.0). Spawning, despawning,
 ## plankton and effects scale with it so a tiny sardine and a blue whale both see a lively ocean.
 func view_k() -> float:
-	return clampf(0.972 / target_zoom(), 0.35, 6.5)
+	return clampf(0.972 / target_zoom(), 0.14, 8.0)
 
 
 ## World pixels per screen pixel: sizes of UI-like things (texts, hp bars, particles) use this
@@ -194,10 +207,15 @@ func _update_darkness(delta: float) -> void:
 	var biome := Database.biome_at(shark.global_position.y)
 	# nights are dark in the shallows too (fades out with depth, where it is dark anyway)
 	var night_dark := eco.night_amount() * 0.55 * clampf(1.0 - shark.global_position.y / 1600.0, 0.0, 1.0)
-	_dark_cur = lerpf(_dark_cur, maxf(float(biome["darkness"]), night_dark), 1.0 - exp(-1.5 * delta))
+	var reg := world.region_at(shark.global_position.x)
+	# murky water (river, swamp, kelp) near the surface, fading with depth
+	var fog := float(reg["fog"]) * clampf(1.0 - shark.global_position.y / 1500.0, 0.2, 1.0)
+	_dark_cur = lerpf(_dark_cur, maxf(maxf(float(biome["darkness"]), night_dark), fog), 1.0 - exp(-1.5 * delta))
+	_tint_cur = _tint_cur.lerp(Color(str(reg["fog_tint"])), 1.0 - exp(-1.2 * delta))
+	dark_mat.set_shader_parameter("tint", _tint_cur)
 	var vp := get_viewport_rect().size
 	var screen := get_viewport().get_canvas_transform() * shark.global_position
-	var light := 1.0 + Database.upgrade_bonus("light") + float(shark.def.get("innate_light", 0.0))
+	var light := (1.0 + Database.upgrade_bonus("light") + float(shark.def.get("innate_light", 0.0))) * float(reg["vis"])
 	# the lit area has a constant size on screen, like the player
 	var world_r := 360.0 * light * (1.0 + 0.01 * float(shark.level - 1)) * ui_k()
 	dark_mat.set_shader_parameter("center", screen / vp)
@@ -208,9 +226,18 @@ func _update_darkness(delta: float) -> void:
 
 func _update_biome() -> void:
 	var b := Database.biome_at(shark.global_position.y)
+	var r := world.region_at(shark.global_position.x)
+	var region_changed := false
+	if str(r["id"]) != region_id:
+		region_id = str(r["id"])
+		region_name = str(r["name"])
+		region_changed = true
+		hud.show_banner(region_name, Color(str(r["tint"])))
 	if str(b["id"]) != biome_id:
 		biome_id = str(b["id"])
-		hud.show_banner(str(b["name"]), Color(str(b["tint"])).lightened(0.3))
+		biome_name = str(b["name"])
+		if not region_changed:
+			hud.show_banner(biome_name, Color(str(b["tint"])).lightened(0.3))
 
 
 # ---------------------------------------------------------------- queries
@@ -219,7 +246,7 @@ func is_solid(p: Vector2, r: float) -> bool:
 		var cell := terrain.local_to_map(terrain.to_local(p + o))
 		if terrain.get_cell_source_id(cell) != -1:
 			return true
-	return false
+	return world.below_bedrock(p.x, p.y)
 
 
 func clamp_to_water(pos: Vector2, d: Dictionary) -> Vector2:
@@ -244,7 +271,7 @@ func _populate_initial() -> void:
 	_counts.clear()
 	var total := 0
 	var tries := 0
-	while total < 55 and tries < 200:
+	while total < 75 and tries < 400:
 		tries += 1
 		total += _spawn_random(false)
 
@@ -261,7 +288,7 @@ func _spawn_tick() -> void:
 			continue
 		total += 1
 		_counts[cr.id] = int(_counts.get(cr.id, 0)) + 1
-	for i in 3:
+	for i in 4:
 		if total < TARGET_CREATURES:
 			total += _spawn_random(true)
 
@@ -276,11 +303,14 @@ func _is_surface_type(d: Dictionary) -> bool:
 	return b == "fly" or b == "surface"
 
 
-func _pick_def(y: float, surface_roll: bool) -> Dictionary:
+func _pick_def(y: float, surface_roll: bool, reg: String) -> Dictionary:
 	var pool: Array = []
 	var total := 0.0
 	for d in Database.creatures:
 		if _is_surface_type(d) != surface_roll:
+			continue
+		var hab: Array = d["habitats"]
+		if not hab.is_empty() and not (reg in hab):
 			continue
 		if not surface_roll and not _is_floor_type(d):
 			if y < float(d["min_depth"]) or y > float(d["max_depth"]):
@@ -299,12 +329,21 @@ func _pick_def(y: float, surface_roll: bool) -> Dictionary:
 	return pool[pool.size() - 1]
 
 
-func _spawn_position(d: Dictionary, around: Vector2, offscreen: bool) -> Vector2:
-	var k := view_k()
-	var dx := randf_range(-1400.0, 1400.0) * k
+## Half the width of the screen in world pixels.
+func half_view_w() -> float:
+	return get_viewport_rect().size.x * 0.5 / maxf(target_zoom(), 0.05)
+
+
+func _spawn_x(around: Vector2, offscreen: bool) -> float:
+	var half := half_view_w()
+	var dx := randf_range(-2.4, 2.4) * half
 	if offscreen:
-		dx = randf_range(550.0, 1100.0) * k * (1.0 if randf() < 0.5 else -1.0)
-	var x := clampf(around.x + dx, 60.0, world_w - 60.0)
+		dx = randf_range(1.1, 2.3) * half * (1.0 if randf() < 0.5 else -1.0)
+	return clampf(around.x + dx, 60.0, world_w - 60.0)
+
+
+func _spawn_position(d: Dictionary, x: float, around: Vector2) -> Vector2:
+	var k := view_k()
 	match str(d["behavior"]):
 		"fly":
 			return Vector2(x, randf_range(-420.0, -140.0))
@@ -321,11 +360,13 @@ func _spawn_random(offscreen: bool) -> int:
 	var around := shark.global_position
 	var surface_roll := randf() < 0.10 and around.y < 900.0
 	var k := view_k()
+	var x := _spawn_x(around, offscreen)
+	var reg := world.region_id_at(x)
 	var y_ref := clampf(around.y + randf_range(-700.0, 700.0) * k, 50.0, world_h - 120.0)
-	var d := _pick_def(y_ref, surface_roll)
+	var d := _pick_def(y_ref, surface_roll, reg)
 	if d.is_empty():
 		return 0
-	var pos := _spawn_position(d, around, offscreen)
+	var pos := _spawn_position(d, x, around)
 	if _is_floor_type(d):
 		if pos.y < float(d["min_depth"]) or pos.y > float(d["max_depth"]) or absf(pos.y - around.y) > 1000.0 * k:
 			return 0

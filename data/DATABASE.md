@@ -8,7 +8,7 @@ Override/extend at runtime by placing a same-named file in `user://data/` (entri
 |---|---|---|
 | id, name, description | - | identity / bestiary text |
 | length | 24 | body length in px (the shark starts at 70) |
-| shape | fish | fish shark whale eel jelly crab ray turtle puffer squid angler chest bird boat diver |
+| shape | fish | fish shark whale eel jelly crab ray turtle puffer squid angler chest bird boat diver croc seahorse octopus |
 | color, accent | #88aacc, #fff | hex colors |
 | sprite | "" | optional single `res://...png` replacing the drawn shape (prefer the `assets/sprites/creatures/<id>/` folder, see assets/sprites/README.md) |
 | sprite_frames | 1 | frames in the `sprite` strip |
@@ -16,7 +16,8 @@ Override/extend at runtime by placing a same-named file in `user://data/` (entri
 | sprite_faces_left, sprite_smooth | false | art faces left / linear filtering for hand-drawn art |
 | sprite_wiggle | 0 | tail wave strength for single-image sprites (0 = off) |
 | sprite_autosize | true | measure the visible pixels and scale them to `length`, ignoring canvas padding |
-| min_depth, max_depth | 0, 3200 | spawn depth in px below surface (10 px = 1 m on the HUD). Ignored for fly/surface/bottom/static, which spawn on their own rules |
+| min_depth, max_depth | 0, 12000 | spawn depth in px below surface (10 px = 1 m on the HUD; the world is ~1216 m deep). Ignored for fly/surface, which spawn on their own rules; bottom/static spawn on the sea floor inside this range |
+| habitats | [] | regions where it spawns: `coast` `kelp` `reef` `ocean` `river` `swamp` (empty = everywhere). Only `ocean` is deep; the others are shelves up to ~200 m |
 | weight | 10 | relative spawn chance |
 | max_count | 10 | max alive at once |
 | school_size | 1 | group size for `school` behavior |
@@ -38,7 +39,9 @@ Override/extend at runtime by placing a same-named file in `user://data/` (entri
 id, name, description, color, belly, length (70), sprite fields (same as creatures; folder `assets/sprites/sharks/<id>/`), speed (300), accel (900), boost_mult (1.6), bite_damage (2), bite_range (44), max_health (100), max_hunger (100), hunger_drain (2.6/s), stamina (100), cost (0 = free), stun_resist (0..1).
 
 ## biomes.json
-id, name, min_depth, max_depth (px), darkness (0..1, 1 = nearly black outside your light), pressure (damage/s, reduced by Deep Hull), tint (banner color). If you change depths, also update `World -> biome_rows` (row = depth / 32) so the water tile colors match.
+id, name, min_depth, max_depth (px), darkness (0..1, 1 = nearly black outside your light), pressure (damage/s, reduced by Deep Hull), tint (banner color). These are the **depth zones** (sunlit, twilight, midnight, abyss, hadal). If you change depths, also update `World -> biome_rows` (row = depth / 32) so the water overlay tiles match.
+
+The **regions** (west to east: coast, kelp, reef, ocean, river, swamp) are defined in `scripts/game/world_generator.gd` (`REGIONS`: name, x range, fog, light radius, current; `PALETTES`: water colours; `PROFILE`: the sea-floor shape).
 
 ## upgrades.json
 id, name, description, stat, per_level, max_level, base_cost, cost_growth (cost = base * growth^level).

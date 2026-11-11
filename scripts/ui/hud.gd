@@ -18,7 +18,41 @@ class HudBar extends Control:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, 0.35), false, 2.0)
 		draw_string(ThemeDB.fallback_font, Vector2(8, size.y - 6), shown, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
 
+## Small world map: regions, sea floor and where you are.
+class Minimap extends Control:
+	var game: Node
+	var _floor := PackedFloat32Array()
+
+	func _draw() -> void:
+		if game == null or game.shark == null:
+			return
+		var w: float = game.world_w
+		var h: float = game.world_h
+		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.55))
+		for r in WorldGenerator.REGIONS:
+			var c := Color(str(r["tint"]))
+			c.a = 0.35
+			draw_rect(Rect2(float(r["x0"]) * size.x, 0.0, (float(r["x1"]) - float(r["x0"])) * size.x, size.y), c)
+		if _floor.is_empty():
+			var n := 150
+			for i in n:
+				_floor.append(game.world.floor_y_at((float(i) + 0.5) / float(n) * w))
+		var pts := PackedVector2Array()
+		pts.append(Vector2(0.0, size.y))
+		for i in _floor.size():
+			pts.append(Vector2(float(i) / float(_floor.size() - 1) * size.x, clampf(_floor[i] / h, 0.0, 1.0) * size.y))
+		pts.append(Vector2(size.x, size.y))
+		draw_colored_polygon(pts, Color(0.08, 0.07, 0.1, 0.95))
+		var sp: Vector2 = game.shark.global_position
+		var dot := Vector2(clampf(sp.x / w, 0.0, 1.0) * size.x, clampf(sp.y / h, 0.0, 1.0) * size.y)
+		draw_circle(dot, 6.0, Color.WHITE)
+		draw_circle(dot, 4.0, Color("#ff4a3a"))
+		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, 0.35), false, 2.0)
+
+
 var game: Node
+var _mini: Minimap
+var _region: Label
 var _root: Control
 var _left: VBoxContainer
 var _right: VBoxContainer
@@ -64,6 +98,14 @@ func _ready() -> void:
 	_score = _rlabel("Score 0", 30)
 	_coins = _rlabel("Coins 0", 22)
 	_depth = _rlabel("Depth 0 m", 20)
+	_region = _rlabel("", 18)
+	_region.add_theme_color_override("font_color", UI.C_DIM)
+	_mini = Minimap.new()
+	_mini.game = game
+	_mini.custom_minimum_size = Vector2(320, 90)
+	_mini.size = Vector2(320, 90)
+	_mini.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(_mini)
 	_clock = _rlabel("", 18)
 	_clock.add_theme_color_override("font_color", UI.C_DIM)
 	_combo = _rlabel("", 26)
@@ -138,6 +180,10 @@ func _process(_delta: float) -> void:
 	_score.text = "Score %s" % _commas(game.score)
 	_coins.text = "Coins %d  (bank %d)" % [game.coins_run, Save.coins()]
 	_depth.text = "Depth %d m" % int(maxf(s.global_position.y, 0.0) / 10.0)
+	_region.text = "%s  •  %s" % [game.region_name, game.biome_name]
+	_mini.position = Vector2(20.0, vp.y - 110.0)
+	_mini.visible = bool(Save.setting("minimap"))
+	_mini.queue_redraw()
 	_clock.text = game.eco.clock_text()
 	if s.combo >= 2:
 		_combo.text = "COMBO x%d   score x%.1f" % [s.combo, s.combo_mult()]

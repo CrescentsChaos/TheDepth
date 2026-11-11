@@ -250,6 +250,10 @@ func _move(delta: float, dir_in: Vector2) -> void:
 		velocity.y *= -0.25
 	else:
 		position.y = np.y
+	if position.y > 0.0:
+		var flow: Vector2 = game.world.current_at(position)
+		if flow != Vector2.ZERO and not game.is_solid(position + flow * delta, r):
+			position += flow * delta
 	position.x = clampf(position.x, 40.0, game.world_w - 40.0)
 	if position.y > game.world_h - 40.0:
 		position.y = game.world_h - 40.0

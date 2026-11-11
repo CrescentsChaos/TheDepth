@@ -7,7 +7,7 @@
     "color": "#9fc9e0",
     "accent": "#e8f4fb",
     "min_depth": 40,
-    "max_depth": 700,
+    "max_depth": 1300,
     "weight": 14,
     "max_count": 36,
     "school_size": 9,
@@ -22,7 +22,13 @@
     "diet": "plankton",
     "activity": "diurnal",
     "rest_style": "open",
-    "migrates": false
+    "migrates": false,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "clownfish",
@@ -31,8 +37,8 @@
     "length": 26,
     "color": "#ff8a2b",
     "accent": "#ffffff",
-    "min_depth": 30,
-    "max_depth": 500,
+    "min_depth": 40,
+    "max_depth": 900,
     "weight": 8,
     "max_count": 8,
     "speed": 70,
@@ -46,7 +52,10 @@
     "activity": "diurnal",
     "rest_style": "reef",
     "territorial": true,
-    "prey_ratio": 0.2
+    "prey_ratio": 0.2,
+    "habitats": [
+      "reef"
+    ]
   },
   {
     "id": "mackerel",
@@ -56,7 +65,7 @@
     "color": "#3e7aa8",
     "accent": "#cfe6f2",
     "min_depth": 60,
-    "max_depth": 900,
+    "max_depth": 1600,
     "weight": 8,
     "max_count": 24,
     "school_size": 6,
@@ -71,7 +80,13 @@
     "diet": "carnivore",
     "activity": "diurnal",
     "rest_style": "open",
-    "prey_ratio": 0.6
+    "prey_ratio": 0.6,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "pufferfish",
@@ -82,7 +97,7 @@
     "color": "#d9c27a",
     "accent": "#7a5c2e",
     "min_depth": 60,
-    "max_depth": 800,
+    "max_depth": 1300,
     "weight": 5,
     "max_count": 5,
     "speed": 45,
@@ -96,7 +111,12 @@
     "diet": "herbivore",
     "activity": "diurnal",
     "rest_style": "reef",
-    "territorial": true
+    "territorial": true,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef"
+    ]
   },
   {
     "id": "tuna",
@@ -105,8 +125,8 @@
     "length": 96,
     "color": "#2f5f8c",
     "accent": "#c8d8e4",
-    "min_depth": 100,
-    "max_depth": 1000,
+    "min_depth": 150,
+    "max_depth": 2200,
     "weight": 5,
     "max_count": 6,
     "speed": 150,
@@ -119,7 +139,11 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "jellyfish",
@@ -130,7 +154,7 @@
     "color": "#e56fd1",
     "accent": "#ffd1f6",
     "min_depth": 80,
-    "max_depth": 1100,
+    "max_depth": 2200,
     "weight": 6,
     "max_count": 10,
     "behavior": "drift",
@@ -145,7 +169,13 @@
     "diet": "plankton",
     "activity": "any",
     "rest_style": "open",
-    "migrates": true
+    "migrates": true,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "sea_turtle",
@@ -155,8 +185,8 @@
     "shape": "turtle",
     "color": "#4d8f4a",
     "accent": "#d9c27a",
-    "min_depth": 50,
-    "max_depth": 900,
+    "min_depth": 60,
+    "max_depth": 1600,
     "weight": 3,
     "max_count": 3,
     "speed": 55,
@@ -171,6 +201,11 @@
     "prey_ratio": 0.0,
     "eats": [
       "jellyfish"
+    ],
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef"
     ]
   },
   {
@@ -181,8 +216,8 @@
     "shape": "ray",
     "color": "#6b7a8f",
     "accent": "#c9d2dc",
-    "min_depth": 150,
-    "max_depth": 1000,
+    "min_depth": 60,
+    "max_depth": 1800,
     "weight": 4,
     "max_count": 4,
     "speed": 70,
@@ -200,6 +235,12 @@
       "crab",
       "isopod",
       "clownfish"
+    ],
+    "habitats": [
+      "coast",
+      "reef",
+      "ocean",
+      "river"
     ]
   },
   {
@@ -209,8 +250,8 @@
     "length": 130,
     "color": "#7e8d9a",
     "accent": "#e2e8ee",
-    "min_depth": 150,
-    "max_depth": 1000,
+    "min_depth": 100,
+    "max_depth": 1800,
     "weight": 4,
     "max_count": 4,
     "behavior": "hunter",
@@ -225,7 +266,12 @@
     "diet": "carnivore",
     "activity": "diurnal",
     "rest_style": "open",
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "dolphin",
@@ -234,8 +280,8 @@
     "length": 170,
     "color": "#6f8ba3",
     "accent": "#e6eef5",
-    "min_depth": 50,
-    "max_depth": 700,
+    "min_depth": 60,
+    "max_depth": 1300,
     "weight": 2,
     "max_count": 2,
     "speed": 210,
@@ -249,7 +295,13 @@
     "activity": "diurnal",
     "rest_style": "open",
     "prey_ratio": 0.38,
-    "leaps": true
+    "leaps": true,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "seagull",
@@ -278,7 +330,13 @@
       "clownfish",
       "mackerel"
     ],
-    "playable": false
+    "playable": false,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "river"
+    ]
   },
   {
     "id": "diver",
@@ -289,7 +347,7 @@
     "color": "#1d3a5c",
     "accent": "#e0b090",
     "min_depth": 60,
-    "max_depth": 600,
+    "max_depth": 900,
     "weight": 4,
     "max_count": 3,
     "behavior": "shooter",
@@ -304,7 +362,12 @@
     "diet": "none",
     "activity": "diurnal",
     "rest_style": "open",
-    "playable": false
+    "playable": false,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef"
+    ]
   },
   {
     "id": "fishing_boat",
@@ -326,7 +389,12 @@
     "diet": "none",
     "activity": "any",
     "rest_style": "open",
-    "playable": false
+    "playable": false,
+    "habitats": [
+      "coast",
+      "ocean",
+      "river"
+    ]
   },
   {
     "id": "crab",
@@ -336,7 +404,7 @@
     "shape": "crab",
     "color": "#d5502e",
     "accent": "#ffb58a",
-    "min_depth": 200,
+    "min_depth": 40,
     "max_depth": 3000,
     "weight": 5,
     "max_count": 5,
@@ -350,7 +418,12 @@
     "flee_range": 150,
     "diet": "scavenger",
     "activity": "nocturnal",
-    "rest_style": "floor"
+    "rest_style": "floor",
+    "habitats": [
+      "coast",
+      "reef",
+      "swamp"
+    ]
   },
   {
     "id": "lanternfish",
@@ -359,8 +432,8 @@
     "length": 20,
     "color": "#2a6fb5",
     "accent": "#7ff5ff",
-    "min_depth": 600,
-    "max_depth": 1700,
+    "min_depth": 900,
+    "max_depth": 4000,
     "weight": 12,
     "max_count": 30,
     "school_size": 10,
@@ -375,7 +448,10 @@
     "diet": "plankton",
     "activity": "any",
     "rest_style": "open",
-    "migrates": true
+    "migrates": true,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "squid",
@@ -385,8 +461,8 @@
     "shape": "squid",
     "color": "#c45a7a",
     "accent": "#ffc4d4",
-    "min_depth": 500,
-    "max_depth": 1600,
+    "min_depth": 900,
+    "max_depth": 3200,
     "weight": 5,
     "max_count": 4,
     "speed": 120,
@@ -400,7 +476,10 @@
     "activity": "any",
     "rest_style": "open",
     "migrates": true,
-    "prey_ratio": 0.45
+    "prey_ratio": 0.45,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "moray_eel",
@@ -410,7 +489,7 @@
     "shape": "eel",
     "color": "#5a6a2a",
     "accent": "#d6c24a",
-    "min_depth": 400,
+    "min_depth": 200,
     "max_depth": 2400,
     "weight": 4,
     "max_count": 3,
@@ -427,7 +506,11 @@
     "activity": "nocturnal",
     "rest_style": "reef",
     "territorial": true,
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "reef",
+      "kelp"
+    ]
   },
   {
     "id": "electric_eel",
@@ -437,8 +520,8 @@
     "shape": "eel",
     "color": "#2a5a7a",
     "accent": "#fff25a",
-    "min_depth": 700,
-    "max_depth": 1800,
+    "min_depth": 60,
+    "max_depth": 1500,
     "weight": 3,
     "max_count": 2,
     "speed": 85,
@@ -452,7 +535,11 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "reef",
-    "prey_ratio": 0.4
+    "prey_ratio": 0.4,
+    "habitats": [
+      "river",
+      "swamp"
+    ]
   },
   {
     "id": "rival_tiger",
@@ -462,8 +549,8 @@
     "shape": "shark",
     "color": "#6c7f8f",
     "accent": "#dfe6ea",
-    "min_depth": 300,
-    "max_depth": 1700,
+    "min_depth": 500,
+    "max_depth": 3000,
     "weight": 2,
     "max_count": 2,
     "behavior": "hunter",
@@ -478,7 +565,12 @@
     "diet": "carnivore",
     "activity": "crepuscular",
     "rest_style": "open",
-    "prey_ratio": 0.55
+    "prey_ratio": 0.55,
+    "habitats": [
+      "kelp",
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "manta_ray",
@@ -488,8 +580,8 @@
     "shape": "ray",
     "color": "#35465a",
     "accent": "#e8eef2",
-    "min_depth": 500,
-    "max_depth": 1700,
+    "min_depth": 700,
+    "max_depth": 2800,
     "weight": 2,
     "max_count": 2,
     "speed": 80,
@@ -501,7 +593,11 @@
     "diet": "filter",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.1
+    "prey_ratio": 0.1,
+    "habitats": [
+      "reef",
+      "ocean"
+    ]
   },
   {
     "id": "blue_whale",
@@ -511,8 +607,8 @@
     "shape": "whale",
     "color": "#4f6f94",
     "accent": "#c6d3e0",
-    "min_depth": 600,
-    "max_depth": 2000,
+    "min_depth": 900,
+    "max_depth": 3600,
     "weight": 0.6,
     "max_count": 1,
     "speed": 55,
@@ -524,7 +620,10 @@
     "diet": "filter",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.1
+    "prey_ratio": 0.1,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "anglerfish",
@@ -534,10 +633,10 @@
     "shape": "angler",
     "color": "#3a2a40",
     "accent": "#ffe36a",
-    "min_depth": 1300,
-    "max_depth": 2700,
+    "min_depth": 2600,
+    "max_depth": 7500,
     "weight": 4,
-    "max_count": 3,
+    "max_count": 4,
     "behavior": "ambush",
     "speed": 130,
     "hp": 6,
@@ -550,7 +649,10 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.6
+    "prey_ratio": 0.6,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "viperfish",
@@ -559,8 +661,8 @@
     "length": 70,
     "color": "#1f3d4a",
     "accent": "#7de8c8",
-    "min_depth": 1400,
-    "max_depth": 2800,
+    "min_depth": 2600,
+    "max_depth": 7000,
     "weight": 5,
     "max_count": 5,
     "behavior": "hunter",
@@ -576,7 +678,10 @@
     "activity": "any",
     "rest_style": "open",
     "migrates": true,
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "gulper_eel",
@@ -586,8 +691,8 @@
     "shape": "eel",
     "color": "#20202e",
     "accent": "#ff5a8a",
-    "min_depth": 1500,
-    "max_depth": 3000,
+    "min_depth": 3000,
+    "max_depth": 8200,
     "weight": 3,
     "max_count": 2,
     "speed": 70,
@@ -600,7 +705,10 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "blobfish",
@@ -609,8 +717,8 @@
     "length": 44,
     "color": "#e9a8a0",
     "accent": "#f6d3cd",
-    "min_depth": 1500,
-    "max_depth": 3100,
+    "min_depth": 3000,
+    "max_depth": 9000,
     "weight": 5,
     "max_count": 4,
     "speed": 30,
@@ -621,7 +729,10 @@
     "score": 120,
     "diet": "scavenger",
     "activity": "any",
-    "rest_style": "floor"
+    "rest_style": "floor",
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "oarfish",
@@ -631,8 +742,8 @@
     "shape": "eel",
     "color": "#c9d4dd",
     "accent": "#ff4a4a",
-    "min_depth": 900,
-    "max_depth": 2200,
+    "min_depth": 1600,
+    "max_depth": 4800,
     "weight": 2,
     "max_count": 2,
     "speed": 60,
@@ -643,7 +754,10 @@
     "score": 480,
     "diet": "plankton",
     "activity": "any",
-    "rest_style": "open"
+    "rest_style": "open",
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "giant_squid",
@@ -653,8 +767,8 @@
     "shape": "squid",
     "color": "#8a2a3a",
     "accent": "#ff9ab0",
-    "min_depth": 1400,
-    "max_depth": 3000,
+    "min_depth": 2600,
+    "max_depth": 8000,
     "weight": 1.2,
     "max_count": 1,
     "behavior": "hunter",
@@ -669,7 +783,10 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "open",
-    "prey_ratio": 0.5
+    "prey_ratio": 0.5,
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "isopod",
@@ -679,10 +796,10 @@
     "shape": "crab",
     "color": "#8c8c9c",
     "accent": "#cfcfdb",
-    "min_depth": 2000,
-    "max_depth": 3200,
+    "min_depth": 3500,
+    "max_depth": 11800,
     "weight": 4,
-    "max_count": 4,
+    "max_count": 6,
     "behavior": "bottom",
     "speed": 35,
     "hp": 3,
@@ -692,7 +809,10 @@
     "score": 80,
     "diet": "scavenger",
     "activity": "any",
-    "rest_style": "floor"
+    "rest_style": "floor",
+    "habitats": [
+      "ocean"
+    ]
   },
   {
     "id": "treasure_chest",
@@ -703,9 +823,9 @@
     "color": "#7a4a22",
     "accent": "#ffd24a",
     "min_depth": 200,
-    "max_depth": 3200,
+    "max_depth": 9000,
     "weight": 2,
-    "max_count": 3,
+    "max_count": 5,
     "behavior": "static",
     "hp": 2,
     "xp": 10,
@@ -718,7 +838,15 @@
     "diet": "none",
     "activity": "any",
     "rest_style": "open",
-    "playable": false
+    "playable": false,
+    "habitats": [
+      "coast",
+      "kelp",
+      "reef",
+      "ocean",
+      "river",
+      "swamp"
+    ]
   },
   {
     "id": "leviathan",
@@ -728,8 +856,8 @@
     "shape": "whale",
     "color": "#7a1f2e",
     "accent": "#d9a05a",
-    "min_depth": 2500,
-    "max_depth": 3200,
+    "min_depth": 5000,
+    "max_depth": 11600,
     "weight": 0.8,
     "max_count": 1,
     "behavior": "hunter",
@@ -744,6 +872,1411 @@
     "diet": "carnivore",
     "activity": "any",
     "rest_style": "open",
+    "prey_ratio": 0.45,
+    "habitats": [
+      "ocean"
+    ]
+  },
+  {
+    "id": "flounder",
+    "name": "Flounder",
+    "description": "Flat and sandy, hides on the bottom.",
+    "length": 52,
+    "color": "#b79d72",
+    "accent": "#e8d6b0",
+    "min_depth": 60,
+    "max_depth": 500,
+    "weight": 5,
+    "max_count": 4,
+    "speed": 55,
+    "hp": 2,
+    "xp": 16,
+    "hunger": 8,
+    "coins": 3,
+    "score": 45,
+    "habitats": [
+      "coast",
+      "river"
+    ],
+    "behavior": "bottom",
+    "flee_range": 140,
+    "diet": "scavenger",
+    "activity": "diurnal",
+    "rest_style": "floor"
+  },
+  {
+    "id": "sea_bass",
+    "name": "Sea Bass",
+    "description": "Patrols the shallows.",
+    "length": 70,
+    "color": "#7f8f96",
+    "accent": "#dfe7ea",
+    "min_depth": 80,
+    "max_depth": 900,
+    "weight": 6,
+    "max_count": 4,
+    "speed": 100,
+    "hp": 2,
+    "xp": 24,
+    "hunger": 14,
+    "coins": 4,
+    "score": 70,
+    "habitats": [
+      "coast",
+      "kelp"
+    ],
+    "flee_range": 260,
+    "diet": "carnivore",
+    "activity": "diurnal",
     "prey_ratio": 0.45
+  },
+  {
+    "id": "hermit_crab",
+    "name": "Hermit Crab",
+    "description": "Carries its home on its back.",
+    "length": 26,
+    "color": "#c97a4a",
+    "accent": "#f0d2a8",
+    "min_depth": 40,
+    "max_depth": 300,
+    "weight": 6,
+    "max_count": 5,
+    "speed": 32,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 5,
+    "coins": 2,
+    "score": 30,
+    "habitats": [
+      "coast"
+    ],
+    "shape": "crab",
+    "behavior": "bottom",
+    "flee_range": 100,
+    "diet": "scavenger",
+    "activity": "any",
+    "rest_style": "floor"
+  },
+  {
+    "id": "seahorse",
+    "name": "Seahorse",
+    "description": "Clings to seagrass.",
+    "length": 30,
+    "color": "#e6a83a",
+    "accent": "#fff0b0",
+    "min_depth": 60,
+    "max_depth": 700,
+    "weight": 4,
+    "max_count": 4,
+    "speed": 30,
+    "hp": 1,
+    "xp": 12,
+    "hunger": 6,
+    "coins": 3,
+    "score": 40,
+    "habitats": [
+      "coast",
+      "reef"
+    ],
+    "shape": "seahorse",
+    "flee_range": 160,
+    "diet": "plankton",
+    "activity": "diurnal",
+    "rest_style": "reef"
+  },
+  {
+    "id": "pelican",
+    "name": "Pelican",
+    "description": "Plunges after fish near the shore.",
+    "length": 70,
+    "color": "#f0ece4",
+    "accent": "#c9a35a",
+    "weight": 5,
+    "max_count": 3,
+    "speed": 110,
+    "hp": 2,
+    "xp": 30,
+    "hunger": 15,
+    "coins": 6,
+    "score": 120,
+    "habitats": [
+      "coast"
+    ],
+    "shape": "bird",
+    "behavior": "fly",
+    "flee_range": 300,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.0,
+    "eats": [
+      "sardine",
+      "mackerel",
+      "sea_bass",
+      "mullet"
+    ],
+    "playable": false
+  },
+  {
+    "id": "sea_lion",
+    "name": "Sea Lion",
+    "description": "Playful hunter, bites back.",
+    "length": 150,
+    "color": "#7a6048",
+    "accent": "#b49a7a",
+    "min_depth": 60,
+    "max_depth": 900,
+    "weight": 2,
+    "max_count": 2,
+    "speed": 170,
+    "hp": 6,
+    "xp": 95,
+    "hunger": 34,
+    "coins": 18,
+    "score": 260,
+    "habitats": [
+      "coast",
+      "kelp"
+    ],
+    "shape": "whale",
+    "contact_damage": 10,
+    "flee_range": 260,
+    "aggro_range": 300,
+    "behavior": "hunter",
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.4,
+    "tags": [
+      "curious"
+    ]
+  },
+  {
+    "id": "mullet",
+    "name": "Mullet",
+    "description": "Silver shallows schooler.",
+    "length": 32,
+    "color": "#a9b8bd",
+    "accent": "#eef3f4",
+    "min_depth": 40,
+    "max_depth": 500,
+    "weight": 10,
+    "max_count": 28,
+    "speed": 100,
+    "hp": 1,
+    "xp": 5,
+    "hunger": 6,
+    "coins": 1,
+    "score": 18,
+    "habitats": [
+      "coast",
+      "river"
+    ],
+    "behavior": "school",
+    "school_size": 8,
+    "flee_range": 270,
+    "diet": "plankton",
+    "activity": "diurnal"
+  },
+  {
+    "id": "garibaldi",
+    "name": "Garibaldi",
+    "description": "Bright orange kelp-forest guard.",
+    "length": 34,
+    "color": "#ff7a1a",
+    "accent": "#ffd09a",
+    "min_depth": 100,
+    "max_depth": 900,
+    "weight": 6,
+    "max_count": 5,
+    "speed": 75,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 7,
+    "coins": 2,
+    "score": 32,
+    "habitats": [
+      "kelp"
+    ],
+    "flee_range": 200,
+    "diet": "omnivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "territorial": true,
+    "prey_ratio": 0.2
+  },
+  {
+    "id": "kelp_bass",
+    "name": "Kelp Bass",
+    "description": "Ambusher between the fronds.",
+    "length": 80,
+    "color": "#6e7e4a",
+    "accent": "#cdd6a0",
+    "min_depth": 150,
+    "max_depth": 1100,
+    "weight": 5,
+    "max_count": 4,
+    "speed": 95,
+    "hp": 3,
+    "xp": 32,
+    "hunger": 16,
+    "coins": 5,
+    "score": 90,
+    "habitats": [
+      "kelp"
+    ],
+    "flee_range": 260,
+    "diet": "carnivore",
+    "activity": "crepuscular",
+    "rest_style": "reef",
+    "prey_ratio": 0.45
+  },
+  {
+    "id": "sea_otter",
+    "name": "Sea Otter",
+    "description": "Dives for urchins and fish.",
+    "length": 90,
+    "color": "#6a4a32",
+    "accent": "#d8bfa2",
+    "min_depth": 30,
+    "max_depth": 500,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 150,
+    "hp": 3,
+    "xp": 45,
+    "hunger": 22,
+    "coins": 9,
+    "score": 150,
+    "habitats": [
+      "kelp",
+      "coast"
+    ],
+    "shape": "whale",
+    "flee_range": 220,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.35,
+    "tags": [
+      "curious"
+    ]
+  },
+  {
+    "id": "leopard_shark",
+    "name": "Leopard Shark",
+    "description": "Spotted shark, calm unless pushed.",
+    "length": 160,
+    "color": "#a79a84",
+    "accent": "#f2eee2",
+    "min_depth": 150,
+    "max_depth": 1100,
+    "weight": 2,
+    "max_count": 2,
+    "speed": 120,
+    "hp": 6,
+    "xp": 95,
+    "hunger": 34,
+    "coins": 16,
+    "score": 240,
+    "habitats": [
+      "kelp",
+      "coast"
+    ],
+    "shape": "shark",
+    "behavior": "hunter",
+    "contact_damage": 14,
+    "aggro_range": 300,
+    "flee_range": 250,
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "sea_star_giant",
+    "name": "Giant Sea Star",
+    "description": "Slowly crawls the rocks.",
+    "length": 40,
+    "color": "#d9552e",
+    "accent": "#ffb48a",
+    "min_depth": 100,
+    "max_depth": 1100,
+    "weight": 4,
+    "max_count": 4,
+    "speed": 18,
+    "hp": 3,
+    "xp": 20,
+    "hunger": 9,
+    "coins": 4,
+    "score": 55,
+    "habitats": [
+      "kelp",
+      "reef"
+    ],
+    "shape": "crab",
+    "behavior": "bottom",
+    "flee_range": 0,
+    "diet": "scavenger",
+    "activity": "any",
+    "rest_style": "floor",
+    "thorns": 3
+  },
+  {
+    "id": "angelfish",
+    "name": "Angelfish",
+    "description": "Elegant reef swimmer.",
+    "length": 38,
+    "color": "#3a6ad8",
+    "accent": "#ffe04a",
+    "min_depth": 60,
+    "max_depth": 900,
+    "weight": 8,
+    "max_count": 8,
+    "speed": 80,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 7,
+    "coins": 2,
+    "score": 36,
+    "habitats": [
+      "reef"
+    ],
+    "flee_range": 220,
+    "diet": "omnivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "territorial": true,
+    "prey_ratio": 0.15
+  },
+  {
+    "id": "butterflyfish",
+    "name": "Butterflyfish",
+    "description": "Flutters between coral heads.",
+    "length": 28,
+    "color": "#ffe04a",
+    "accent": "#ffffff",
+    "min_depth": 50,
+    "max_depth": 800,
+    "weight": 8,
+    "max_count": 10,
+    "speed": 70,
+    "hp": 1,
+    "xp": 8,
+    "hunger": 6,
+    "coins": 2,
+    "score": 28,
+    "habitats": [
+      "reef"
+    ],
+    "flee_range": 200,
+    "diet": "omnivore",
+    "activity": "diurnal",
+    "rest_style": "reef"
+  },
+  {
+    "id": "parrotfish",
+    "name": "Parrotfish",
+    "description": "Crunches coral, grazes algae.",
+    "length": 72,
+    "color": "#2fb3a0",
+    "accent": "#f06ab0",
+    "min_depth": 60,
+    "max_depth": 1100,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 85,
+    "hp": 2,
+    "xp": 26,
+    "hunger": 13,
+    "coins": 4,
+    "score": 75,
+    "habitats": [
+      "reef"
+    ],
+    "flee_range": 230,
+    "diet": "herbivore",
+    "activity": "diurnal",
+    "rest_style": "reef"
+  },
+  {
+    "id": "lionfish",
+    "name": "Lionfish",
+    "description": "Venomous spines. Look, do not bite.",
+    "length": 46,
+    "color": "#b83a2a",
+    "accent": "#f2e6d0",
+    "min_depth": 80,
+    "max_depth": 1200,
+    "weight": 4,
+    "max_count": 4,
+    "speed": 50,
+    "hp": 3,
+    "xp": 34,
+    "hunger": 12,
+    "coins": 6,
+    "score": 100,
+    "habitats": [
+      "reef"
+    ],
+    "thorns": 7,
+    "poison": 4,
+    "diet": "carnivore",
+    "activity": "crepuscular",
+    "rest_style": "reef",
+    "territorial": true,
+    "prey_ratio": 0.45
+  },
+  {
+    "id": "octopus",
+    "name": "Octopus",
+    "description": "Clever and sneaky.",
+    "length": 70,
+    "color": "#c4533a",
+    "accent": "#ffc9a8",
+    "min_depth": 100,
+    "max_depth": 1400,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 90,
+    "hp": 4,
+    "xp": 60,
+    "hunger": 22,
+    "coins": 12,
+    "score": 170,
+    "habitats": [
+      "reef",
+      "kelp"
+    ],
+    "shape": "octopus",
+    "behavior": "ambush",
+    "contact_damage": 9,
+    "aggro_range": 300,
+    "flee_range": 280,
+    "diet": "carnivore",
+    "activity": "nocturnal",
+    "rest_style": "reef",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "reef_squid",
+    "name": "Reef Squid",
+    "description": "Shimmering reef squid.",
+    "length": 50,
+    "color": "#e9a5b0",
+    "accent": "#ffe9ee",
+    "min_depth": 100,
+    "max_depth": 1300,
+    "weight": 5,
+    "max_count": 6,
+    "speed": 110,
+    "hp": 2,
+    "xp": 22,
+    "hunger": 10,
+    "coins": 4,
+    "score": 60,
+    "habitats": [
+      "reef"
+    ],
+    "shape": "squid",
+    "behavior": "school",
+    "school_size": 4,
+    "flee_range": 250,
+    "diet": "carnivore",
+    "activity": "crepuscular",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "sea_snake",
+    "name": "Banded Sea Snake",
+    "description": "Venomous. Keep away.",
+    "length": 120,
+    "color": "#2a3a4a",
+    "accent": "#e8e8e8",
+    "min_depth": 60,
+    "max_depth": 800,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 85,
+    "hp": 3,
+    "xp": 50,
+    "hunger": 18,
+    "coins": 10,
+    "score": 140,
+    "habitats": [
+      "reef",
+      "coast"
+    ],
+    "shape": "eel",
+    "behavior": "ambush",
+    "contact_damage": 12,
+    "poison": 4,
+    "aggro_range": 280,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "rest_style": "reef",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "box_jellyfish",
+    "name": "Box Jellyfish",
+    "description": "Nearly invisible, terribly painful.",
+    "length": 44,
+    "color": "#9fd8ff",
+    "accent": "#e0f4ff",
+    "min_depth": 40,
+    "max_depth": 700,
+    "weight": 3,
+    "max_count": 4,
+    "speed": 45,
+    "hp": 2,
+    "xp": 18,
+    "hunger": 6,
+    "coins": 6,
+    "score": 70,
+    "habitats": [
+      "coast",
+      "reef"
+    ],
+    "shape": "jelly",
+    "behavior": "drift",
+    "contact_damage": 14,
+    "stun": 1.2,
+    "poison": 4,
+    "diet": "plankton",
+    "activity": "any",
+    "migrates": true
+  },
+  {
+    "id": "hammerhead_reef",
+    "name": "Whitetip Reef Shark",
+    "description": "Hunts reef fish at night.",
+    "length": 130,
+    "color": "#8a98a4",
+    "accent": "#f2f2f2",
+    "min_depth": 100,
+    "max_depth": 1300,
+    "weight": 2,
+    "max_count": 2,
+    "speed": 130,
+    "hp": 6,
+    "xp": 90,
+    "hunger": 32,
+    "coins": 14,
+    "score": 230,
+    "habitats": [
+      "reef"
+    ],
+    "shape": "shark",
+    "behavior": "hunter",
+    "contact_damage": 14,
+    "aggro_range": 320,
+    "flee_range": 240,
+    "diet": "carnivore",
+    "activity": "nocturnal",
+    "rest_style": "floor",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "giant_clam",
+    "name": "Giant Clam",
+    "description": "Snaps shut. Pearls inside.",
+    "length": 54,
+    "color": "#bfae8c",
+    "accent": "#3a9ad8",
+    "min_depth": 80,
+    "max_depth": 1000,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 0,
+    "hp": 4,
+    "xp": 40,
+    "hunger": 10,
+    "coins": 25,
+    "score": 120,
+    "habitats": [
+      "reef"
+    ],
+    "shape": "chest",
+    "behavior": "static",
+    "thorns": 4,
+    "diet": "none",
+    "playable": false,
+    "tags": [
+      "treasure"
+    ]
+  },
+  {
+    "id": "cleaner_shrimp",
+    "name": "Cleaner Shrimp",
+    "description": "Cleans the big fish.",
+    "length": 16,
+    "color": "#e86a4a",
+    "accent": "#ffffff",
+    "min_depth": 60,
+    "max_depth": 900,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 40,
+    "hp": 1,
+    "xp": 6,
+    "hunger": 4,
+    "coins": 2,
+    "score": 25,
+    "habitats": [
+      "reef"
+    ],
+    "shape": "crab",
+    "behavior": "bottom",
+    "flee_range": 80,
+    "diet": "scavenger",
+    "activity": "any",
+    "rest_style": "reef"
+  },
+  {
+    "id": "flying_fish",
+    "name": "Flying Fish",
+    "description": "Glides above the waves.",
+    "length": 34,
+    "color": "#5a9ad0",
+    "accent": "#d8ecff",
+    "min_depth": 40,
+    "max_depth": 700,
+    "weight": 6,
+    "max_count": 8,
+    "speed": 130,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 6,
+    "coins": 2,
+    "score": 34,
+    "habitats": [
+      "ocean"
+    ],
+    "behavior": "school",
+    "school_size": 6,
+    "flee_range": 320,
+    "diet": "plankton",
+    "activity": "diurnal",
+    "leaps": true
+  },
+  {
+    "id": "mahi_mahi",
+    "name": "Mahi-Mahi",
+    "description": "Fast golden hunter.",
+    "length": 110,
+    "color": "#3ab88a",
+    "accent": "#f2d84a",
+    "min_depth": 100,
+    "max_depth": 1400,
+    "weight": 4,
+    "max_count": 3,
+    "speed": 170,
+    "hp": 4,
+    "xp": 50,
+    "hunger": 22,
+    "coins": 8,
+    "score": 140,
+    "habitats": [
+      "ocean"
+    ],
+    "flee_range": 320,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "marlin",
+    "name": "Blue Marlin",
+    "description": "Spear-nosed speedster.",
+    "length": 230,
+    "color": "#2a5aa0",
+    "accent": "#c8d8ea",
+    "min_depth": 200,
+    "max_depth": 2000,
+    "weight": 1.2,
+    "max_count": 1,
+    "speed": 210,
+    "hp": 12,
+    "xp": 160,
+    "hunger": 50,
+    "coins": 30,
+    "score": 380,
+    "habitats": [
+      "ocean"
+    ],
+    "behavior": "hunter",
+    "contact_damage": 24,
+    "aggro_range": 420,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "hammerhead_open",
+    "name": "Great Hammerhead",
+    "description": "Sweeps the open ocean.",
+    "length": 250,
+    "color": "#6f7f8a",
+    "accent": "#dfe7ec",
+    "min_depth": 150,
+    "max_depth": 2400,
+    "weight": 1.5,
+    "max_count": 1,
+    "speed": 150,
+    "hp": 12,
+    "xp": 170,
+    "hunger": 52,
+    "coins": 32,
+    "score": 420,
+    "habitats": [
+      "ocean",
+      "reef"
+    ],
+    "shape": "shark",
+    "behavior": "hunter",
+    "contact_damage": 24,
+    "aggro_range": 480,
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "sperm_whale",
+    "name": "Sperm Whale",
+    "description": "Dives deep after squid.",
+    "length": 430,
+    "color": "#59606e",
+    "accent": "#b8bec9",
+    "min_depth": 900,
+    "max_depth": 6000,
+    "weight": 0.6,
+    "max_count": 1,
+    "speed": 70,
+    "hp": 60,
+    "xp": 380,
+    "hunger": 100,
+    "coins": 120,
+    "score": 1600,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "whale",
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.5,
+    "eats": [
+      "giant_squid",
+      "squid"
+    ]
+  },
+  {
+    "id": "moonfish",
+    "name": "Sunfish",
+    "description": "Huge, slow and harmless.",
+    "length": 130,
+    "color": "#8ea2b0",
+    "accent": "#e6edf1",
+    "min_depth": 100,
+    "max_depth": 1800,
+    "weight": 2,
+    "max_count": 2,
+    "speed": 45,
+    "hp": 6,
+    "xp": 80,
+    "hunger": 30,
+    "coins": 12,
+    "score": 200,
+    "habitats": [
+      "ocean"
+    ],
+    "flee_range": 0,
+    "diet": "plankton",
+    "activity": "diurnal"
+  },
+  {
+    "id": "trout",
+    "name": "Trout",
+    "description": "Quick river fish.",
+    "length": 44,
+    "color": "#7a9a5a",
+    "accent": "#f0dfa0",
+    "min_depth": 60,
+    "max_depth": 900,
+    "weight": 10,
+    "max_count": 10,
+    "speed": 100,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 8,
+    "coins": 2,
+    "score": 36,
+    "habitats": [
+      "river"
+    ],
+    "flee_range": 260,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "salmon",
+    "name": "Salmon",
+    "description": "Swims the river mouth.",
+    "length": 70,
+    "color": "#d98a7a",
+    "accent": "#f4d4c8",
+    "min_depth": 60,
+    "max_depth": 1100,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 115,
+    "hp": 2,
+    "xp": 26,
+    "hunger": 14,
+    "coins": 5,
+    "score": 80,
+    "habitats": [
+      "river",
+      "coast"
+    ],
+    "behavior": "school",
+    "school_size": 5,
+    "flee_range": 280,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "pike",
+    "name": "Pike",
+    "description": "Ambusher of the weeds.",
+    "length": 110,
+    "color": "#587a3a",
+    "accent": "#d9e0a0",
+    "min_depth": 80,
+    "max_depth": 1000,
+    "weight": 4,
+    "max_count": 3,
+    "speed": 130,
+    "hp": 5,
+    "xp": 60,
+    "hunger": 24,
+    "coins": 10,
+    "score": 170,
+    "habitats": [
+      "river",
+      "swamp"
+    ],
+    "behavior": "ambush",
+    "contact_damage": 16,
+    "aggro_range": 340,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "reef",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "catfish",
+    "name": "Catfish",
+    "description": "Whiskered mud feeder.",
+    "length": 100,
+    "color": "#7a6a52",
+    "accent": "#d8c9a8",
+    "min_depth": 100,
+    "max_depth": 1100,
+    "weight": 4,
+    "max_count": 4,
+    "speed": 55,
+    "hp": 4,
+    "xp": 45,
+    "hunger": 20,
+    "coins": 7,
+    "score": 120,
+    "habitats": [
+      "river",
+      "swamp"
+    ],
+    "diet": "scavenger",
+    "activity": "nocturnal",
+    "rest_style": "floor"
+  },
+  {
+    "id": "river_otter",
+    "name": "River Otter",
+    "description": "Quick and curious.",
+    "length": 85,
+    "color": "#6a4a2e",
+    "accent": "#d9c2a2",
+    "min_depth": 30,
+    "max_depth": 600,
+    "weight": 4,
+    "max_count": 3,
+    "speed": 160,
+    "hp": 3,
+    "xp": 40,
+    "hunger": 20,
+    "coins": 8,
+    "score": 130,
+    "habitats": [
+      "river"
+    ],
+    "shape": "whale",
+    "flee_range": 220,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.35,
+    "tags": [
+      "curious"
+    ]
+  },
+  {
+    "id": "river_dolphin",
+    "name": "River Dolphin",
+    "description": "Pale, curious river dolphin.",
+    "length": 160,
+    "color": "#b0a8b8",
+    "accent": "#f0e8f4",
+    "min_depth": 100,
+    "max_depth": 1200,
+    "weight": 1.5,
+    "max_count": 2,
+    "speed": 140,
+    "hp": 7,
+    "xp": 100,
+    "hunger": 36,
+    "coins": 20,
+    "score": 300,
+    "habitats": [
+      "river"
+    ],
+    "flee_range": 300,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.38,
+    "tags": [
+      "curious"
+    ]
+  },
+  {
+    "id": "crayfish",
+    "name": "Crayfish",
+    "description": "Scuttles along the river bed.",
+    "length": 24,
+    "color": "#a24a32",
+    "accent": "#e8a888",
+    "min_depth": 40,
+    "max_depth": 900,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 28,
+    "hp": 1,
+    "xp": 10,
+    "hunger": 5,
+    "coins": 2,
+    "score": 30,
+    "habitats": [
+      "river",
+      "swamp"
+    ],
+    "shape": "crab",
+    "behavior": "bottom",
+    "flee_range": 100,
+    "diet": "scavenger",
+    "activity": "nocturnal",
+    "rest_style": "floor"
+  },
+  {
+    "id": "heron",
+    "name": "Heron",
+    "description": "Stands and strikes at fish.",
+    "length": 90,
+    "color": "#8a9aa8",
+    "accent": "#e8eef2",
+    "weight": 5,
+    "max_count": 3,
+    "speed": 100,
+    "hp": 2,
+    "xp": 36,
+    "hunger": 16,
+    "coins": 7,
+    "score": 130,
+    "habitats": [
+      "river",
+      "swamp"
+    ],
+    "shape": "bird",
+    "behavior": "fly",
+    "flee_range": 300,
+    "diet": "carnivore",
+    "activity": "diurnal",
+    "prey_ratio": 0.0,
+    "eats": [
+      "trout",
+      "mullet",
+      "sardine",
+      "swamp_minnow"
+    ],
+    "playable": false
+  },
+  {
+    "id": "swamp_minnow",
+    "name": "Swamp Minnow",
+    "description": "Tiny and plentiful.",
+    "length": 18,
+    "color": "#8a9a5a",
+    "accent": "#d0d8a8",
+    "min_depth": 30,
+    "max_depth": 600,
+    "weight": 12,
+    "max_count": 30,
+    "speed": 80,
+    "hp": 1,
+    "xp": 3,
+    "hunger": 4,
+    "coins": 1,
+    "score": 12,
+    "habitats": [
+      "swamp",
+      "river"
+    ],
+    "behavior": "school",
+    "school_size": 10,
+    "flee_range": 250,
+    "diet": "plankton",
+    "activity": "diurnal"
+  },
+  {
+    "id": "bullfrog_tadpole",
+    "name": "Giant Tadpole",
+    "description": "Wriggles near the surface.",
+    "length": 26,
+    "color": "#4a5a2a",
+    "accent": "#9aaa6a",
+    "min_depth": 30,
+    "max_depth": 400,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 50,
+    "hp": 1,
+    "xp": 6,
+    "hunger": 5,
+    "coins": 1,
+    "score": 20,
+    "habitats": [
+      "swamp"
+    ],
+    "flee_range": 170,
+    "diet": "herbivore",
+    "activity": "diurnal",
+    "rest_style": "reef"
+  },
+  {
+    "id": "gar",
+    "name": "Alligator Gar",
+    "description": "Armored predator with a long snout.",
+    "length": 170,
+    "color": "#5a6a3a",
+    "accent": "#c8c890",
+    "min_depth": 80,
+    "max_depth": 1000,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 100,
+    "hp": 8,
+    "xp": 80,
+    "hunger": 32,
+    "coins": 14,
+    "score": 260,
+    "habitats": [
+      "swamp",
+      "river"
+    ],
+    "shape": "eel",
+    "behavior": "hunter",
+    "contact_damage": 18,
+    "aggro_range": 360,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.45
+  },
+  {
+    "id": "snapping_turtle",
+    "name": "Snapping Turtle",
+    "description": "Hides in the mud and bites hard.",
+    "length": 90,
+    "color": "#4a4a30",
+    "accent": "#9a9a60",
+    "min_depth": 60,
+    "max_depth": 900,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 40,
+    "hp": 8,
+    "xp": 70,
+    "hunger": 26,
+    "coins": 12,
+    "score": 200,
+    "habitats": [
+      "swamp",
+      "river"
+    ],
+    "shape": "turtle",
+    "contact_damage": 14,
+    "thorns": 3,
+    "flee_range": 0,
+    "diet": "omnivore",
+    "activity": "any",
+    "rest_style": "floor",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "water_snake",
+    "name": "Water Snake",
+    "description": "Slithers through the roots.",
+    "length": 100,
+    "color": "#5a6a2a",
+    "accent": "#cfd48a",
+    "min_depth": 30,
+    "max_depth": 500,
+    "weight": 4,
+    "max_count": 3,
+    "speed": 80,
+    "hp": 2,
+    "xp": 30,
+    "hunger": 12,
+    "coins": 5,
+    "score": 80,
+    "habitats": [
+      "swamp",
+      "river"
+    ],
+    "shape": "eel",
+    "contact_damage": 8,
+    "poison": 2,
+    "flee_range": 200,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "reef",
+    "prey_ratio": 0.4
+  },
+  {
+    "id": "alligator",
+    "name": "Alligator",
+    "description": "The swamp's apex predator. Stay clear.",
+    "length": 320,
+    "color": "#3e5a2e",
+    "accent": "#b8c88a",
+    "min_depth": 30,
+    "max_depth": 900,
+    "weight": 1.2,
+    "max_count": 2,
+    "speed": 95,
+    "hp": 26,
+    "xp": 360,
+    "hunger": 70,
+    "coins": 50,
+    "score": 900,
+    "habitats": [
+      "swamp",
+      "river"
+    ],
+    "shape": "croc",
+    "behavior": "ambush",
+    "contact_damage": 34,
+    "aggro_range": 620,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "any",
+    "rest_style": "floor",
+    "territorial": true,
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "vampire_squid",
+    "name": "Vampire Squid",
+    "description": "Glows in the dark and drifts.",
+    "length": 60,
+    "color": "#3a1a30",
+    "accent": "#ff5a7a",
+    "min_depth": 2600,
+    "max_depth": 7000,
+    "weight": 4,
+    "max_count": 4,
+    "speed": 60,
+    "hp": 3,
+    "xp": 60,
+    "hunger": 18,
+    "coins": 12,
+    "score": 180,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "squid",
+    "flee_range": 200,
+    "diet": "scavenger",
+    "activity": "any",
+    "tags": [
+      "curious"
+    ]
+  },
+  {
+    "id": "dumbo_octopus",
+    "name": "Dumbo Octopus",
+    "description": "Flaps its ear-fins and floats.",
+    "length": 46,
+    "color": "#e8a8c0",
+    "accent": "#fff0f6",
+    "min_depth": 3600,
+    "max_depth": 10000,
+    "weight": 3,
+    "max_count": 3,
+    "speed": 38,
+    "hp": 3,
+    "xp": 70,
+    "hunger": 18,
+    "coins": 14,
+    "score": 200,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "octopus",
+    "diet": "scavenger",
+    "activity": "any"
+  },
+  {
+    "id": "hadal_snailfish",
+    "name": "Hadal Snailfish",
+    "description": "The deepest fish of all.",
+    "length": 50,
+    "color": "#d8c8d8",
+    "accent": "#fff6ff",
+    "min_depth": 8200,
+    "max_depth": 11900,
+    "weight": 6,
+    "max_count": 6,
+    "speed": 45,
+    "hp": 2,
+    "xp": 90,
+    "hunger": 18,
+    "coins": 16,
+    "score": 260,
+    "habitats": [
+      "ocean"
+    ],
+    "flee_range": 160,
+    "diet": "scavenger",
+    "activity": "any"
+  },
+  {
+    "id": "vent_eelpout",
+    "name": "Vent Eelpout",
+    "description": "Lives around hydrothermal vents.",
+    "length": 40,
+    "color": "#e8d8c8",
+    "accent": "#ff6a4a",
+    "min_depth": 4500,
+    "max_depth": 11000,
+    "weight": 5,
+    "max_count": 6,
+    "speed": 50,
+    "hp": 2,
+    "xp": 45,
+    "hunger": 14,
+    "coins": 9,
+    "score": 140,
+    "habitats": [
+      "ocean"
+    ],
+    "behavior": "school",
+    "school_size": 5,
+    "diet": "scavenger",
+    "activity": "any"
+  },
+  {
+    "id": "colossal_squid",
+    "name": "Colossal Squid",
+    "description": "Bigger than any giant squid.",
+    "length": 480,
+    "color": "#7a2a3e",
+    "accent": "#ff9a8a",
+    "min_depth": 5200,
+    "max_depth": 10500,
+    "weight": 0.7,
+    "max_count": 1,
+    "speed": 130,
+    "hp": 90,
+    "xp": 900,
+    "hunger": 100,
+    "coins": 220,
+    "score": 3400,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "squid",
+    "behavior": "hunter",
+    "contact_damage": 48,
+    "aggro_range": 950,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.45
+  },
+  {
+    "id": "trench_horror",
+    "name": "Trench Horror",
+    "description": "Something very old lives down here.",
+    "length": 360,
+    "color": "#1e1038",
+    "accent": "#b45aff",
+    "min_depth": 8600,
+    "max_depth": 11900,
+    "weight": 0.5,
+    "max_count": 1,
+    "speed": 120,
+    "hp": 70,
+    "xp": 700,
+    "hunger": 100,
+    "coins": 200,
+    "score": 3000,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "angler",
+    "behavior": "ambush",
+    "contact_damage": 52,
+    "aggro_range": 900,
+    "flee_range": 0,
+    "diet": "carnivore",
+    "activity": "any",
+    "prey_ratio": 0.5
+  },
+  {
+    "id": "abyssal_chest",
+    "name": "Sunken Treasure",
+    "description": "Old riches rest in the dark.",
+    "length": 46,
+    "color": "#4a3a2a",
+    "accent": "#ffe04a",
+    "min_depth": 3000,
+    "max_depth": 11000,
+    "weight": 1.5,
+    "max_count": 3,
+    "speed": 0,
+    "hp": 3,
+    "xp": 20,
+    "hunger": 0,
+    "coins": 90,
+    "score": 500,
+    "habitats": [
+      "ocean"
+    ],
+    "shape": "chest",
+    "behavior": "static",
+    "diet": "none",
+    "playable": false,
+    "tags": [
+      "treasure"
+    ]
   }
 ]
